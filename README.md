@@ -1,4 +1,4 @@
-# VA-Dashboard
+# Verbal Autopsy Management Dashboard
 Source Code of the VA Dashboard
 
 ## Demo environment
