@@ -1,0 +1,14 @@
+/*
+* Background color: #1D1F20
+*/
+
+body {  
+  background: #FFF;
+  padding: 16px;
+}
+
+.chart-container {
+  position: relative;
+  margin: auto;
+  height: 40vh;
+}
