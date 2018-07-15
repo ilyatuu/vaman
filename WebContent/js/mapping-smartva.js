@@ -105,6 +105,13 @@ function renderSmartVA(va_data_in_json){
 		        va_de['value']=value;
 		        va_arr.push(va_de);
 		        break;
+		    case "GEN_2_3T":
+				va_de = {};
+		        va_de['id']=key;
+		        va_de['label']="Township";
+		        va_de['value']=value;
+		        va_arr.push(va_de);
+		        break;
 			case "GEN_5_1E":
 				va_de = {};
 		        va_de['id']=key;

@@ -31,7 +31,7 @@
 <section>
 <div class="row" style="margin-top:100px;">
 	<div class="col-sm-offset-2 col-sm-5">
-		<img src= "images/logo.svg" style="width:300px; display:block;margin:auto;" alt="VMan Management Dashboard">
+		<img src= "images/logo.svg" style="display:block;margin:auto;" alt="VMan Management Dashboard">
 		<h4>Monitor quality and progress of verbal autopsy data collection processes</h4>
 		<ul class="fa-ul">
 			<li><i class="fa-li fa fa-check-square"></i>See real time data as submitted by verbal autopsy interviewers</li>
@@ -110,7 +110,7 @@
 			<h4>ODK collect settings</h4>
 			<p>URL: http://www.vatools.net/whova<br />Username: ODK<br />Password: Pass@321</p>
 		</div>
-		<div class="well well-sm">
+		<div class="well well-sm" style="margin-top:20px; overflow:auto;">
 			<ul>
 				<li>Download user manual &rArr; <a href="docs/manual.pdf" target="_blank">link</a></li>
 			</ul>
@@ -119,65 +119,84 @@
 </div>
 <section>
 <div class="row">
-<div class="col-sm-offset-1 col-sm-6">
-	<h2>Basic configurations</h2>
-	<h5>Configure database connection file</h5>
-	<p>
-		Navigate to &lt;web root folder &gt;/WEB-INF/classes. Use any text editor to edit the file db.properties. Input the appropiate values
-		as shown below
-	</p>
-<pre>## Database connection, comment below if postgres db
-db.driver=com.mysql.jdbc.Driver
-db.url=jdbc:mysql://localhost
-
-## Postgresql Connection, Comment below if mysql db
-#db.driver=org.postgresql.Driver
-#db.schema=public
-#db.url=jdbc:postgresql://localhost:5432/
-
-## Database credentials
-db.name=dbname
-db.user=dbuser
-db.pass=dbpassword
-</pre>
-	<h5>Configure setting file</h5>
-	<p>
-		Navigate to &lt;web root folder &gt;/WEB-INF/classes. Use any text editor to edit the file st.properties. Input the appropiate values
-		as shown below
-	</p>
-<pre>## Settings file
-app.name = crvs
-app.page_title = 'The Republic of Tanzania'
-app.page_sub_title = 'Verbal Autopsy Management Dashboard'
-app.page_logo_file = 'crvs.png'
-
-## Type of the VA Data Mapping vile 1 = WHOVA and 2 = SmartVA
-app.va_type = 1
-
-## Administration structure levels
-app.admin_level1 = 'Region'
-app.admin_level2 = 'District'
-app.admin_level3 = 'Ward'
-app.admin_level4 = 'Village'
-
-## Interviewer's source data
-app.interviewers_name_table = '`VAWHOV151_CORE`'
-app.interviewers_name_column = '`RESPONDENT_BACKGR_ID10010`'
-app.interviewers_phone_column = '`PHONENUMBER`'
-</pre>
-	
-</div>
+	<div class="row">
+		<div class="col-sm-offset-1 col-sm-10">
+			<h2>Basic configurations</h2>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-sm-offset-1 col-sm-4">
+			<h5>Configure database connection</h5>
+			<p>
+				Navigate to &lt;web root folder &gt;/WEB-INF/classes. Use any text editor to edit 
+				the file db.properties. Input the appropiate values as shown below
+			</p>
+			<div class="well" style="margin-top:20px; overflow:auto;">
+				# for mysql database			<br />
+				db.driver=com.mysql.jdbc.Driver	<br />
+				db.url=jdbc:mysql://localhost	<br /><br />
+												
+				# comment above and uncomme below for postgres database <br />
+				#db.driver=org.postgresql.Driver						<br />
+				#db.schema=public										<br />
+				#db.url=jdbc:postgresql://localhost:5432/				<br /><br />
+				
+				## Database credentials		<br />
+				db.name=dbname				<br />
+				db.user=dbuser				<br />
+				db.pass=dbpassword			<br />
+			</div>
+		</div>
+		<div class=" col-sm-offset-1 col-sm-4">
+			<h5>Configure settings</h5>
+			<p>
+				Navigate to &lt;web root folder &gt;/WEB-INF/classes. Use any text editor to edit 
+				the file st.properties. Input the appropiate values as shown below
+			</p>
+			<div class="well" style="margin-top:20px; overflow:auto;">
+				app.name = crvs												<br />
+				app.page_title = 'The United Republic of Tanzania'			<br />
+				app.page_sub_title = 'Verbal Autopsy Management Dashboard'	<br /><br />
+				
+				## VA Data Mapping types. 1 = WHOVA and 2 = SmartVA			<br />
+				app.va_type = 1												<br /><br />
+				
+				## Administration structure levels							<br />
+				app.admin_level1 = 'Region'									<br />
+				app.admin_level2 = 'District'								<br />
+				app.admin_level3 = 'Ward'									<br />
+				app.admin_level4 = 'Village'								<br /><br />
+				
+				## Interviewer's source data								<br />
+				app.interviewers_name_table = 'va_table_name'				<br />
+				app.interviewers_name_column = 'respondent_column_name'		<br />
+				app.interviewers_phone_column = 'responded_phone_no'		<br />
+			</div>
+		</div>
+	</div>
 </div>
 </section>
-<br />
-<footer class="navbar-default navbar-fixed-bottom">
-  <div class="container-fluid text-center">
-    <span>&copy; CRVS 2018</span>
-  </div>
-</footer>
-
 </div>
 <!-- end page container -->
+<!-- footer -->
+<footer class="footer" style="margin-top:20px;">
+	<div class="row">
+	  	<div class="col-sm-offset-3 col-sm-2 text-primary">
+	  		<h4>Support comes from</h4>
+	  	</div>
+	  	<div class="col-sm-2">
+	  		<img src="images/crvs_tz.png" style="width:200px; display:block;">
+	  	</div>
+	  	<div class="col-sm-2">
+	  		<img src="images/d4h.png" style="width:200px; display:block;">
+	  	</div>
+  	</div>
+	<div class="row text-center" style="margin-top:20px;">
+  		<span><strong>&copy; CRVS 2018</strong></span>
+  	</div>
+</footer>
+<!-- end of footer section -->
+
 <script type="text/javascript" src="js/jquery.min.js"></script>
 <script src="js/plugins/forms/validate.min.js"></script>
 <script>

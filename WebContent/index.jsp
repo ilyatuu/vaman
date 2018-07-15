@@ -30,7 +30,7 @@
 <section id="s1content">
 <div class="row" style="margin-top:100px;">
 	<div class="col-sm-offset-2 col-sm-5">
-		<img src= "images/logo.svg" style="width:300px; display:block;margin:auto;" alt="VMan Management Dashboard">
+		<img src= "images/logo.png" style="display:block;margin:auto;" alt="VMan Management Dashboard">
 		<h4>Monitor quality and progress of verbal autopsy data collection processes</h4>
 		<ul class="fa-ul">
 			<li><i class="fa-li fa fa-check-square"></i>See real time data as submitted by verbal autopsy interviewers</li>
@@ -73,9 +73,17 @@
 	</div>
 </div>
 </section>
-<footer class="navbar-default navbar-fixed-bottom">
-  <div class="container-fluid text-center">
-    <span>&copy; CRVS 2018</span>
+<footer class="footer navbar-fixed-bottom">
+  <div class="row">
+  	<div class="col-sm-offset-3 col-sm-2">
+  		<h4>Development support and testing comes from</h4>
+  	</div>
+  	<div class="col-sm-2">
+  		<img src="images/d4h.png" style="width:200px; display:block;">
+  	</div>
+  </div>
+  <div class="container-fluid text-center" style="padding-top:10px;padding-botton:5px;">
+    <span><strong>&copy; CRVS 2018</strong></span>
   </div>
 </footer>
 </div>
