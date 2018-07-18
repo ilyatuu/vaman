@@ -126,7 +126,7 @@
 	</div>
 	<div class="row">
 		<div class="col-sm-offset-1 col-sm-4">
-			<h5>Configure database connection</h5>
+			<h5>1. Configure database connection</h5>
 			<p>
 				Navigate to &lt;web root folder &gt;/WEB-INF/classes. Use any text editor to edit 
 				the file db.properties. Input the appropiate values as shown below
@@ -148,7 +148,7 @@
 			</div>
 		</div>
 		<div class=" col-sm-offset-1 col-sm-4">
-			<h5>Configure settings</h5>
+			<h5>2. Configure settings</h5>
 			<p>
 				Navigate to &lt;web root folder &gt;/WEB-INF/classes. Use any text editor to edit 
 				the file st.properties. Input the appropiate values as shown below
@@ -188,7 +188,7 @@
 	  		<img src="images/crvs_tz.png" style="width:200px; display:block;">
 	  	</div>
 	  	<div class="col-sm-2">
-	  		<img src="images/d4h.png" style="width:200px; display:block;">
+	  		<img src="images/d4h.png" style="width:400px; display:block;">
 	  	</div>
   	</div>
 	<div class="row text-center" style="margin-top:20px;">

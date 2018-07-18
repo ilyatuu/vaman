@@ -30,7 +30,7 @@
 <section id="s1content">
 <div class="row" style="margin-top:100px;">
 	<div class="col-sm-offset-2 col-sm-5">
-		<img src= "images/logo.png" style="display:block;margin:auto;" alt="VMan Management Dashboard">
+		<img src= "images/logo.svg" style="display:block;margin:auto;" alt="VMan Management Dashboard">
 		<h4>Monitor quality and progress of verbal autopsy data collection processes</h4>
 		<ul class="fa-ul">
 			<li><i class="fa-li fa fa-check-square"></i>See real time data as submitted by verbal autopsy interviewers</li>
@@ -79,7 +79,7 @@
   		<h4>Development support and testing comes from</h4>
   	</div>
   	<div class="col-sm-2">
-  		<img src="images/d4h.png" style="width:200px; display:block;">
+  		<img src="images/d4h.png" style="width:400px; display:block;">
   	</div>
   </div>
   <div class="container-fluid text-center" style="padding-top:10px;padding-botton:5px;">
