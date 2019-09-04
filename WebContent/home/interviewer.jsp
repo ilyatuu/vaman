@@ -27,7 +27,7 @@
 			<div class="toolbar" style="margin-top:-0.6em;">
 				<div class="form-inline" role="form">
 				<div class="form-group">
-					<button class="btn btn-default btn-nxt-year">
+					<button class="btn btn-default btn-prev-year">
 	        			<i class="glyphicon glyphicon-chevron-left"></i> Prev
 	        		</button>
 					<input type="text" class="form-control" name="txtGraphYear" id="txtGraphYear" value="2018" size=4 style="text-align:center" readonly>
@@ -132,7 +132,30 @@ $(document).ready(function(){
 				$("#txtGraphYear").val("2018");
 				break;
 			case 2018:
+				$("#txtGraphYear").val("2019");
+				break;
+			case 2019:
 				$("#txtGraphYear").val("2017");
+				break;
+		}
+		//Refresh graph
+		//Check if there is any selection
+		if( $("#tblInterviewer").bootstrapTable('getSelections').length < 1)
+			$("#interviewer_name").val( "" );
+		updateChart();
+		
+	})
+	
+	$(".btn-prev-year").click(function(e){
+		switch( parseInt($("#txtGraphYear").val()) ){
+			case 2017:
+				$("#txtGraphYear").val("2019");
+				break;
+			case 2018:
+				$("#txtGraphYear").val("2017");
+				break;
+			case 2019:
+				$("#txtGraphYear").val("2018");
 				break;
 		}
 		//Refresh graph

@@ -54,7 +54,7 @@
             <i class="fa fa-lock form-control-feedback"></i>
             </div>
            	<div class="row form-actions">
-            <div class="col-xs-6">
+            <div class="col-sm-6 col-md-6">
             <div class="checkbox">
             <label>
             <input id="rememberme" name="rememberme" type="checkbox" class="styled">
@@ -62,8 +62,9 @@
             </label>
             </div>
             </div>
-            <div class="col-xs-6">
-            	<button type="submit" class="btn btn-warning pull-right"><i class="fa fa-bars"></i> Sign in</button>
+            <div class="col-sm-6 col-md-6">
+            	<button type="submit" class="btn btn-warning pull-right"><i class="fa fa-sign-in"></i>
+            		<span class="hidden-sm hidden-xs">Sign in</span></button>
             	<input type="hidden" name="rtype" value="1">
             </div>
             </div>
@@ -74,12 +75,12 @@
 </div>
 </section>
 <footer class="footer navbar-fixed-bottom">
-  <div class="row">
-  	<div class="col-sm-offset-3 col-sm-2">
+  <div class="row hidden-sm hidden-xs">
+  	<div class="col-md-offset-3 col-md-2">
   		<h4>Development support and testing comes from</h4>
   	</div>
-  	<div class="col-sm-2">
-  		<img src="images/d4h.png" style="width:400px; display:block;">
+  	<div class="col-md-4">
+  		<img src="images/d4h.png" style="width:400px; display:block;" class="img-responsive">
   	</div>
   </div>
   <div class="container-fluid text-center" style="padding-top:10px;padding-botton:5px;">
@@ -124,7 +125,7 @@ $(document).ready(function(){
 			        dataType : 'json'
 				}).done(function (data) {
 			        if (data.success) {               
-			        	window.location.replace("home/index.jsp?sid="+data.sid);
+			        	window.location.replace("home/index.jsp?sid="+data.sid+"&type="+data.roleid);
 			        } else {
 			           validator.showErrors( {"password": data.message});
 			        }

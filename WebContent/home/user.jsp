@@ -53,10 +53,16 @@
 						<input name="phone" type="text" placeholder="Phone" class="form-control">
 					</div>
 					<div class="col-sm-2">
-						<input name="org" type="text" placeholder="Organization" class="form-control">
+						<select name="org" class="select2_ctl" data-placeholder="Organization" style="width : 100%;">
+							<option></option>
+							<option value="MoH">MoH</option>
+							<option value="10Wards">10 Wards</option>
+							<option value="Iringa">Iringa</option>
+							<option value="GeitaShinyanga">Geita Shinyanga</option>
+						</select>
 					</div>
 					<div class="col-sm-2">
-						<select name="role" class="select2_ctl" style="width : 100%;">
+						<select name="role" class="select2_ctl" data-placeholder="Role" style="width : 100%;">
 							<option></option>
 							<option value="0">Read Only</option>
 							<option value="1">Data Manager</option>
@@ -162,17 +168,17 @@
 </div>
 <!-- end modal div -->
 <div id="divAssignVA" class="modal fade" tabindex="-1" role="dialog">
-<div class="modal-dialog modal-lg">
+<div class="modal-dialog modal-lg" style="width:90% !important;">
 <div class="modal-header">
 	<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-	<h5 class="modal-title">Assign VA to a coder</h5>
+	<h5 class="modal-title">Assign VA Record to Coder</h5>
 </div>
 <div class="modal-body has-padding" style="background-color:#fff;">
 	<div class="row">
 		<!-- Left side -->
 		<div class="col-sm-4">
 			<div class="panel panel-default">
-			<div class="panel-heading has-padding">Physician Details</div>
+			<div class="panel-heading has-padding"><h5>Physician Details</h5></div>
 			<div class="panel-body">
 				<form class="form-horizontal" role="form" id="frmAssignVA" name="frmAssignVA">
 					<div class="form-group">
@@ -218,7 +224,21 @@
 		<!-- Right side -->
 		<div class="col-sm-8">
 			<div class="panel panel-default">
-			<div class="panel-heading has-padding">List of VA Records</div>
+			<div class="panel-heading has-padding">
+				<div class="row">
+					
+					<div class="col-sm-4"><h5>List of VA Records</h5></div>
+					<div class="col-sm-4 text-right"><h6>Select Table:</h6></div>
+					<div class="col-sm-4">
+					<select id="va_table" name="va_table" class="select2_ctl" style="width : 100%;">
+						<option value='none'> - - </option>
+          				<option value='"WHOVAV14TZ_CORE2"'>WHOVA14TZ_CORE</option>
+          				<option value='"WHOVA151_CORE"'>WHOVA151_CORE</option>
+          				<option value='"HIA4SD_CORE"'>HIA4SD_CORE</option>
+          			</select>
+				</div>					
+				</div>
+			</div>
 			<div class="panel-body">
 				<div class="row" style="margin-top:-.5em; padding:0 5px;">
 					<div id="toolbar">
@@ -262,22 +282,25 @@ $(document).ready(function(){
 		$tblAssignment = $("#tblAssignment"),
 		$btnAssign = $("#btnAssign");
 	
+	loadAssignments2()
+	
 	//api key button click
 	$("#api_key_btn").click(function(){
 		$("#api_key").val( generateKey() );
 	})
 	//set select class
 	$(".select2_ctl").select2({
-		placeholder: "Role",
 		minimumResultsForSearch: Infinity
 	});
-	
 	$("#editUserModal").on("shown.bs.modal",function(e){
 		$("input[name='update_passwd_chk']").attr('checked', false);
 	});
 	$("#divAssignVA").on("shown.bs.modal",function(e){
-		loadAssignments();
+		//loadAssignments();
 	});
+	$("#va_table").on("change",function(e){
+		$tblAssignment.bootstrapTable("refresh");
+	})
 		
 	$tblAssignment.on('check.bs.table uncheck.bs.table check-all.bs.table uncheck-all.bs.table', function () {
         $btnAssign.prop('disabled', !$tblAssignment.bootstrapTable('getSelections').length);
@@ -486,13 +509,89 @@ $(document).ready(function(){
 		$.ajax({
 			url:"../UserMethods",
 			type:"post",
-			data:$("#frmAssignVA").serialize()+"&vaids="+vaids,
+			data:$("#frmAssignVA").serialize()+"&vaids="+vaids+"&va_table="+$("#va_table").val(),
 			success:function(data){
 				
 			}
 		})
 	}
 	//list user function
+	function loadAssignments2(){
+		$tblAssignment.bootstrapTable({
+			url:"../GetBootTable",
+			method:"post",
+			pagination: true,
+			sidePagination: "server",
+			showColumns: true,
+			contentType: 'application/x-www-form-urlencoded',
+			idField:'_URI',
+			clickToSelect:true,
+			search: false,
+			pageSize: 10,
+	    	pageList: [10, 25, 50],
+			queryParams: function(p){
+				return{
+					rtype: 103,
+					tablename: $("#va_table").val(),
+					limit : this.pageSize,
+					offset: this.pageSize * (this.pageNumber - 1),
+					//search: this.searchText,
+					searchBy : $("#searchBy").val(),
+					searchVal: $("#searchVal").val(),
+					orderBy:	this.sortName,
+					orderVal:  this.sortOrder
+				}
+			},onDblClickRow: function (row, $element) {
+				//alert( row['_URI'] );
+	            //var key = row["key"];               
+	            $("#divViewVA").modal("show");
+	        },
+			columns: [{
+		    	field: 'Assign',
+		    	checkbox:true,
+		    	align:'center',
+		    	valign:'middle'
+		    },{
+			   	field: '_URI',
+		    	title: 'URI',
+		    	visible: false
+		    },{
+		    	field:'va_table',
+		    	title:'Source Table',
+		    	visible:false,
+		    },{
+			   	field: 'coder1',
+		    	title: 'Coder 1',
+		    	sortable: true
+		    },{
+			   	field: 'coder2',
+		    	title: 'Coder 2',
+		    	sortable: true
+		    },{
+			   	field: 'death_category',
+		    	title: 'VA Type',
+		    	sortable: true
+		    },{
+			   	field: 'death_loc_level1',
+		    	title: admin_level1,
+		    	sortable: true
+		    },{
+			   	field: 'death_loc_level2',
+		    	title: admin_level2,
+		    	sortable: true
+		    },{
+		    	field:'interviewer_name',
+		    	title:'Interviewer',
+		    	sortable:true,
+		    	visible:false
+		    },{
+		    	field:'interview_date',
+		    	title:'Interview Date',
+		    	sortable:true,
+		    	visible:false
+		    }]
+		});
+	}
 	function loadAssignments(){
 		$tblAssignment.bootstrapTable({
 			url:"../GetBootTable",
@@ -570,37 +669,29 @@ $(document).ready(function(){
 					        	sortable:true
 					         },{
 					        	field:'assigned',
-					        	title:'Assigned VA',
+					        	title:'Assigned',
 					        	sortable:true,
 					        	align:'right'
 					         },{
-					        	 field:'attempted',
-					        	 title:'Attempted VA',
-					        	 sortable:true,
-					        	 align:'right'
-					         },{
-					        	 field:'concordant',
-					        	 title:'Concordant VA',
-					        	 sortable:true,
-					        	 align:'right'
-					         },{
-					        	 field:'discordant',
-					        	 title:'Discordant VA',
+					        	 field:'coded',
+					        	 title:'Coded',
 					        	 sortable:true,
 					        	 align:'right'
 					         },{
 					        	 field:'pending',
-					        	 title:'Pending VA',
+					        	 title:'Pending',
+					        	 sortable:true,
+					        	 align:'right',
+					        	 formatter:formatDifferences
+					        	 
+					         },{
+					        	 field:'concordant',
+					        	 title:'Concordant',
 					        	 sortable:true,
 					        	 align:'right'
 					         },{
-					        	 field:'incomplete_c1',
-					        	 title:'Incomplete C1',
-					        	 sortable:true,
-					        	 align:'right'
-					         },{
-					        	 field:'incomplete_c2',
-					        	 title:'Incomplete C2',
+					        	 field:'discordant',
+					        	 title:'Discordant',
 					        	 sortable:true,
 					        	 align:'right'
 					         }]
@@ -661,7 +752,10 @@ $(document).ready(function(){
 		})
 	}//end get users function
 	
-	//function 
+	//function
+	function formatDifferences(value,row,index){
+		return row['assigned'] - row['coded'];
+	}
 	function formatEditColumn(value, row, index){
 		switch(value){
 		case "Coder":

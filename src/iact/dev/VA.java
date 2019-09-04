@@ -201,7 +201,10 @@ public class VA {
 					colname = columns.getColumnName(i);
 					if(colname.indexOf("_ID") > 0){
 						colname = colname.substring(colname.indexOf("_ID")+1, colname.length());
-					}					
+					}
+					if(colname.indexOf("_AGE") > 0){
+						colname = colname.substring(colname.indexOf("_AGE")+1, colname.length());
+					}
 					json.put(colname, rset.getObject(i));
 				}
 			}
@@ -275,22 +278,128 @@ public class VA {
 	/*
 	 * Assign VA
 	 * */
+	public JSONObject getCodedVA(String tblName,String filterBy, int limitTo) {
+		try {
+			
+			//get the denominator
+			sql  = "select count(*)";
+			sql += " from _web_assignment a";
+			sql += " left join "+tblName+" b on a.va_uri = b.\"_URI\"";
+			sql += " where returnUnderline(coder1_coda,coder1_codb,coder1_codc,coder1_codd) = returnUnderline(coder2_coda,coder2_codb,coder2_codc,coder2_codd)";
+			sql += " and va_table = ? ";
+			
+			switch(filterBy.toString().toLowerCase()) {
+			case "adults":
+				sql += " and \"CONSENTED_DECEASED_CRVS_INFO_ON_DECEASED_IS_ADULT\"::integer = 1";
+				break;
+			case "children":
+				sql += " and \"CONSENTED_DECEASED_CRVS_INFO_ON_DECEASED_IS_CHILD\"::integer = 1";
+				break;
+			case "neonates":
+				sql += " and \"CONSENTED_DECEASED_CRVS_INFO_ON_DECEASED_IS_NEONATAL\"::integer = 1";
+				break;
+			}
+			
+			sql += ";";
+			
+			db = new DbConnect();
+			cnn = db.getConn();
+			pstm = cnn.prepareStatement(sql);
+			pstm.setString(1, tblName);
+			
+			rset = pstm.executeQuery();
+			int rows = 0;
+			if(rset.next()) {
+				rows = rset.getInt(1);
+			}
+			json = new JSONObject();
+			json.put("total", rows);
+			
+			if(rows==0) {
+				json.put("data", "");
+				return json;
+			}
+			
+			//get the data
+			sql = "select ROW_NUMBER () OVER (order by count(icdname) desc) as position,";
+			sql += " icdcode,icdname,count(icdname) as count, round(count(icdname)::decimal / ? * 100,2) as ratio ";
+			sql += " from ( select va_uri::text, c.icdcode::text, c.icdname::text,";
+			sql += " case";
+			sql += " when \"CONSENTED_DECEASED_CRVS_INFO_ON_DECEASED_IS_NEONATAL\"::integer = 1 then 'neonates'";
+			sql += " when \"CONSENTED_DECEASED_CRVS_INFO_ON_DECEASED_IS_CHILD\"::integer = 1 then 'children'";
+			sql += " when \"CONSENTED_DECEASED_CRVS_INFO_ON_DECEASED_IS_ADULT\"::integer = 1 then 'adults'";
+			sql += " else 'unknown'";
+			sql += " end as category";
+			sql += " from _web_assignment a";
+			sql += " left join "+tblName+" b on a.va_uri = b.\"_URI\"";
+			sql += " left join _web_icd10 c on returnUnderline(coder1_coda,coder1_codb,coder1_codc,coder1_codd) = c.id";
+			sql += " where";
+			sql += " returnUnderline(coder1_coda,coder1_codb,coder1_codc,coder1_codd) = returnUnderline(coder2_coda,coder2_codb,coder2_codc,coder2_codd)";
+			sql += " and b.\"_URI\" is not null";
+			sql += " ) as codedVA";
+			
+			if (!filterBy.equalsIgnoreCase("all")) {
+				sql += " where category = '"+filterBy+"'";
+			}
+			
+			sql += " group by icdcode,icdname limit ?";
+			
+			
+			pstm = cnn.prepareStatement(sql);
+			pstm.setInt(1, rows);
+			pstm.setInt(2, limitTo);
+			
+			rset = pstm.executeQuery();
+			columns = rset.getMetaData();
+			jarr = new JSONArray();
+			while(rset.next()) {
+				jobj = new JSONObject();
+				for (int i=1;i<=columns.getColumnCount();i++){
+					colname = columns.getColumnName(i);
+					jobj.put( colname, rset.getObject(i));
+				}
+				jarr.put(jobj);
+			}
+			json = new JSONObject();
+			json.put("total", limitTo);
+			json.put("rows", jarr);
+
+			return json;
+		}catch(SQLException e){
+			e.printStackTrace();
+		}catch(Exception e){
+			e.printStackTrace();
+		}finally{
+			try{
+		         if(pstm!=null)
+		            pstm.close();
+		      }catch(SQLException se){
+		      }// do nothing
+		      try{
+		         if(cnn!=null)
+		            cnn.close();
+		      }catch(SQLException se){
+		         se.printStackTrace();
+		      }//end finally try
+		}
+		return null;
+	}
 	public boolean AssignVA(JSONObject vaObj){
 		try{
 			if(vaObj.getInt("coderType")==1){
 				//Coder 1
 				if(vaObj.getString("assignType").equalsIgnoreCase("assign")){
-					sql  = "INSERT INTO _web_assignment(coder1_id,coder1_assigned_date,va_uri) VALUES(?,?,?);";
+					sql  = "INSERT INTO _web_assignment(coder1_id,coder1_assigned_date,va_table,va_uri) VALUES(?,?,?,?);";
 				}else{
 					//Update
-					sql  = "UPDATE _web_assignment SET coder1_id=?,coder1_assigned_date=? WHERE va_uri=?;";
+					sql  = "UPDATE _web_assignment SET coder1_id=?,coder1_assigned_date=?,va_table=? WHERE va_uri=?;";
 				}
 			}else{
 				//Coder 2
 				if(vaObj.getString("assignType").equalsIgnoreCase("assign")){
-					sql  = "INSERT INTO _web_assignment(coder2_id,coder2_assigned_date,va_uri) VALUES(?,?,?);";
+					sql  = "INSERT INTO _web_assignment(coder2_id,coder2_assigned_date,va_table,va_uri) VALUES(?,?,?,?);";
 				}else{
-					sql  = "UPDATE _web_assignment SET coder2_id=?,coder2_assigned_date=? WHERE va_uri=?;";
+					sql  = "UPDATE _web_assignment SET coder2_id=?,coder2_assigned_date=?,va_table=? WHERE va_uri=?;";
 				}
 				
 			}
@@ -303,7 +412,8 @@ public class VA {
 			for(int i=0;i<jarr.length();i++){
 				pstm.setInt(1, vaObj.getInt("coderId"));
 				pstm.setTimestamp(2, Timestamp.valueOf(sqlDate));
-				pstm.setString(3, jarr.getString(i));
+				pstm.setString(3, vaObj.getString("va_table"));
+				pstm.setString(4, jarr.getString(i));
 				pstm.addBatch();
 			}			
 			pstm.executeBatch();

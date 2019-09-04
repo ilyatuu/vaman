@@ -37,7 +37,7 @@
   }
 
 }
-
+ 
 /* Your local CSS File */
 @font-face {
     font-family: 'Cuprum';
@@ -68,6 +68,15 @@
 .msg_panel{
 	height:100px;
 	overflow-y:scroll;
+}
+.row-underline{
+	border-bottom:1px solid #ccc;
+	margin:10px 2px;
+	padding-bottom:10px;
+}
+.text-large {
+  text-align: center;
+  font: 18px Arial, sans-serif;
 }
 .fontawesome-list > .row > div > div {
   background: #fcfcfc;
@@ -299,7 +308,7 @@ label.error.valid {
   position: absolute;
   left: 30px;
   top: 0;
-  width: 230px;
+  width: 200px;
   padding-bottom: 30px;
   z-index: 800;
 }
@@ -449,7 +458,7 @@ label.error.valid {
 /* Page content */
 
 .page-content {
-  margin-left: 270px;
+  margin-left: 220px;
 }
 
 .full-width .page-content {

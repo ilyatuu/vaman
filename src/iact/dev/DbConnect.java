@@ -29,7 +29,7 @@ public class DbConnect {
 			if (driver != null) {
 				if(driver.contains("mysql")){
 					try{
-						Class.forName("com.mysql.jdbc.Driver").newInstance();
+						Class.forName("com.mysql.jdbc.Driver");
 						cType = ConnectionType.mySQL;
 					}catch(ClassNotFoundException e){
 						System.out.println("Missing JDBC Driver. Please include mysql connector it in your library path");

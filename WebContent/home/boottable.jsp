@@ -7,7 +7,7 @@
 <title>VA Data</title>
 <%@ page import="iact.dev.Settings" %>
 <%
-	int roleid=0,userid=0;
+	int roleid=0,userid=0,notcoded=0,discordant=0;
 	if(session.getAttribute("roleid") != null){
 		roleid = Integer.parseInt(session.getAttribute("roleid").toString());
 	}
@@ -19,13 +19,22 @@
 		//response.sendRedirect("../index.jsp");
 		response.getWriter().write("Your session has expired. Please <a href='../index.jsp'>relogin</a>");
 		return;
-	}	
+	}
+	if(request.getParameterMap().containsKey("notcoded")){
+		notcoded = Integer.parseInt(request.getParameter("notcoded"));
+	}
+	if(request.getParameterMap().containsKey("discordant")){
+		discordant = Integer.parseInt(request.getParameter("discordant"));
+	}
 %>
 </head>
 <body>
 <div class="page-container container-fluid" style="padding:0;">
 <div class="panel panel-default">
-	<div class="panel-heading"><h6 class="panel-title"><i class="fa fa-list"></i>Individual Data</h6></div>
+	<div class="panel-heading">
+		<h6 class="panel-title"><i class="fa fa-list"></i>Individual Data</h6>
+		<div class="pull-right"><h6 id="physician_name" class="panel-title"><i class="fa fa-user"></i>Physician Name</h6></div>
+	</div>
 	<div class="panel-body">
 		<div class="row">
 		<div class="rtl-inputs" style="padding-right:5px;">
@@ -40,8 +49,7 @@
 			</div>
 			<div class="col-md-2">
 				<select data-tags="true" id="searchBy" name="searchBy" class="select">
-					<option value="interviewer_name">Interviewer Name</option>
-					<option value='"_URI"'>VA UUID</option>
+					<option value='va_uri'>VA UUID</option>
 				</select>
 			</div>
 		</div>
@@ -89,11 +97,12 @@
 					<h5>VA Type: 			<span id="summary-va-type" 		class="text-primary"></span> </h5>
 					<h5>Interviewer Name:	<span id="summary-int-name" 	class="text-primary"></span> </h5>
 					<h5>Interviewer Phone:	<span id="summary-int-phone" 	class="text-primary"></span> </h5>
-					<h5>Interview Date:		<span id="summary-int-date" 	class="text-primary"></span> </h5>
+					<h5>Respondent Name:	<span id="summary-res-name" 	class="text-primary"></span> </h5>
+					<h5>Respondent Phone:	<span id="summary-res-phone" 	class="text-primary"></span> </h5>
 					<h5>Interview Start:	<span id="summary-int-start" 	class="text-primary"></span> </h5>
 					<h5>Interview End:		<span id="summary-int-end" 		class="text-primary"></span> </h5>
 					<h5>Interview Time:		<span id="summary-int-time" 	class="text-primary"></span> </h5>
-					<h5>Narrative character count:		<span id="summary-int-narr-chars" 	class="text-primary"></span> </h5>
+					<h5>Narrative Section:	<span id="summary-narrative" 	class="text-primary"></span> </h5>
 				</div>
 			</div>
 		</div>
@@ -205,7 +214,7 @@
 <script>
 $(document).ready(function(){			
 	var rowIndex, coderType, vadata;
-	var rowId;
+	var rowId, tableId;
 	var userId = <%= userid %>;
 	
 	// VAType 1=WHOVA, 2=SmartVA
@@ -231,17 +240,18 @@ $(document).ready(function(){
 	
 	// On row click, store URI (row unique ID)
 	 $("#tblVAData").on('click-row.bs.table', function(e, row, $element){
-	    	rowId = row['_URI'];
+	    	rowId = row['va_uri'];
+	    	tableId = row['va_table'];
 	 });
 	
 	//On displaying modal, get the VA document
 	$('#divEditCoD').on('show.bs.modal', function () {
-		getVAData(rowId);
+		getVAData(rowId,tableId);
 	});
 	
 	//On viewing modal, view the VA document
 	$('#divViewVA').on('show.bs.modal', function () {
-		viewVAData(rowId);
+		viewVAData(rowId,tableId);
 	});
 	
 	//Load VA Data
@@ -254,7 +264,7 @@ $(document).ready(function(){
 		default: //administrator
 			loadVAData();
 				//Add option values for administrator
-			$("#searchBy").append("<option value='c1name'>Physician Name</option>");
+			//$("#searchBy").append("<option value='c1name'>Physician Name</option>");
 			break;
 	}	
 	$("#searchBtn").click(function(){
@@ -275,59 +285,72 @@ $(document).ready(function(){
 		//var userid = <%= userid %>;
 		assignCoD(rowId,userId);
 		//Update table cell according to corder type
-		updateTableCell(RowIndex,"c"+coderType+"ucd",returnUnderline());
+		
+		if( $("#cod_a").val() > 0)
+			updateTableCell(RowIndex,"coda",$("#cod_a").select2('data').text);
+		else
+			updateTableCell(RowIndex,"coda","-");
+		
+		if( $("#cod_b").val() > 0)
+			updateTableCell(RowIndex,"codb",$("#cod_b").select2('data').text);
+		else
+			updateTableCell(RowIndex,"codb","-");
+		
+		if( $("#cod_c").val() > 0)
+			updateTableCell(RowIndex,"codc",$("#cod_c").select2('data').text);
+		else
+			updateTableCell(RowIndex,"codc","-");
+		
+		if( $("#cod_d").val() > 0)
+			updateTableCell(RowIndex,"codd",$("#cod_d").select2('data').text);
+		else
+			updateTableCell(RowIndex,"codd","-");
+		
+		//updateTableCell(RowIndex,"c"+coderType+"ucd",returnUnderline());
 		//Close modal
 		$("#divEditCoD").modal("hide");
 	});
 	
 	$("#tblVAData").on('click-row.bs.table', function(e, row, $element){
 		//Assign
-		$("#summary-va-id").text( row['_URI'] );
-		$("#summary-va-type").text( row['death_category'] );
-		$("#summary-int-name").text( row['interviewer_name'] );
-		$("#summary-int-phone").text( row['interviewer_phone'] );
-		$("#summary-int-date").text( row['interview_date'] );
-		$("#summary-int-start").text( row['interview_start'] );
-		$("#summary-int-end").text( row['interview_end'] );
-		$("#summary-int-time").text( row['interview_time'] );
-		$("#summary-int-narr-chars").text( row['narrative_chars'] );
+		$("#summary-va-id").text( row['va_uri'] );
 		
 		RowIndex = $element.index();
 		resetForm();
 		//Update coding sheet area
-		if(userId==row['c1id']){
+		if(userId==row['coder1_id']){
 			//coder1
-			if(row['c1comments'] != null)
-				$("#notes").text( row['c1comments'] );
+			if(row['coder1_comments'] != null)
+				$("#notes").text( row['coder1_comments'] );
 			else
 				$("#notes").val("");
 				
 			//Update CoD
-			if(row['c1codaid']!=null)
-		    	$("#cod_a").select2('val',row['c1codaid']);
-			if(row['c1codbid']!=null)
-			    $("#cod_b").select2('val',row['c1codbid']);
-			if(row['c1codcid']!=null)
-				$("#cod_c").select2('val',row['c1codcid']);
-			if(row['c1coddid']!=null)
-				$("#cod_d").select2('val',row['c1coddid']);
+			if(row['coder1_coda']!=null)
+		    	$("#cod_a").select2('val',row['coder1_coda']);
+			if(row['coder1_codb']!=null)
+			    $("#cod_b").select2('val',row['coder1_codb']);
+			if(row['coder1_codc']!=null)
+				$("#cod_c").select2('val',row['coder1_codc']);
+			if(row['coder1_codd']!=null)
+				$("#cod_d").select2('val',row['coder1_codd']);
 			coderType=1;
 		}
-		if(userId==row['c2id']){
+		if(userId==row['coder2_id']){
 			//coder2
-			if(row['c2comments'] != null)
-				$("#notes").text( row['c2comments'] );	
+			if(row['coder2_comments'] != null)
+				$("#notes").text( row['coder2_comments'] );	
 			else
 				$("#notes").val("");
 			//Update CoD
-			if(row['c2codaid']!=null)
-		    	$("#cod_a").select2('val',row['c2codaid']);
-			if(row['c2codbid']!=null)
-			    $("#cod_b").select2('val',row['c2codbid']);
-			if(row['c2codcid']!=null)
-				$("#cod_c").select2('val',row['c2codcid']);
-			if(row['c2coddid']!=null)
-				$("#cod_d").select2('val',row['c2coddid']);
+			if(row['coder2_coda']!=null)
+		    	$("#cod_a").select2('val',row['coder2_coda']);
+			if(row['coder2_codb']!=null)
+			    $("#cod_b").select2('val',row['coder2_codb']);
+			if(row['coder2_codc']!=null)
+				$("#cod_c").select2('val',row['coder2_codc']);
+			if(row['coder2_codd']!=null)
+				$("#cod_d").select2('val',row['coder2c_odd']);
 			coderType=2;
 		}
 	});//end table click event
@@ -352,10 +375,11 @@ $(document).ready(function(){
 	}
 	//function pre-load search box
 	function loadSearchBox(){
-		$("#searchBy").append("<option value='death_loc_level2'>"+admin_level2+"</option>");
-		$("#searchBy").append("<option value='death_loc_level3'>"+admin_level3+"</option>");
+		//$("#searchBy").append("<option value='death_loc_level2'>"+admin_level2+"</option>");
+		//$("#searchBy").append("<option value='death_loc_level3'>"+admin_level3+"</option>");
 	}
-	//load VA data
+	
+	//load VA data by coder: getAssginedVA
 	function loadVADataByCoder(userId){
 		$("#tblVAData").bootstrapTable({
 			url:"../GetBootTable",
@@ -371,8 +395,10 @@ $(document).ready(function(){
 	    	pageList: [10, 25, 50, 100],
 			queryParams: function(p){
 				return{
-					rtype: 2,
-					tablename: "view_individual_va",
+					rtype: 104,
+					tablename: "not_used", //V2 does not use this parameter
+					notcoded:<%= notcoded %>,
+					discordant:<%= discordant %>,
 					limit : this.pageSize,
 					offset: this.pageSize * (this.pageNumber - 1),
 					//search: this.searchText,
@@ -388,41 +414,39 @@ $(document).ready(function(){
 	            $("#divViewVA").modal("show");
 	        },
 			columns: [{
-			   	field: 'death_loc_level1',
-		    	title: admin_level1,
+			   	field: 'va_uri',
+		    	title: 'VA ID',
+		    	sortable: false
+		    },{
+			   	field: 'assigned_date',
+		    	title: 'Date Assigned',
 		    	sortable: true
 		    },{
-			   	field: 'death_loc_level2',
-		    	title: admin_level2,
+			   	field: 'coda',
+		    	title: 'Cause A',
+		    	width: 150,
 		    	sortable: true
 		    },{
-			   	field: 'death_loc_level3',
-		    	title: admin_level3,
+			   	field: 'codb',
+		    	title: 'Cause B',
+		    	width: 150,
+		    	sortable: true,
+		    },{
+			   	field: 'codc',
+		    	title: 'Cause C',
+		    	width: 150,
 		    	sortable: true
 		    },{
-			   	field: 'deceased_name',
-		    	title: 'Deceased',
+			   	field: 'codd',
+		    	title: 'Cause D',
+		    	width: 150,
 		    	sortable: true
 		    },{
-			   	field: 'interviewer_name',
-		    	title: 'Interviewer',
-		    	sortable: true
+			   	field: 'va_table',
+		    	title: 'VA Table',
+		    	visible: false
 		    },{
-			   	field: 'interviewer_phone',
-		    	title: 'Interviewer Phone',
-		    	visible:false,
-		    	sortable: true
-		    },{
-			   	field: 'death_category',
-		    	title: 'VA Type',
-		    	sortable: true
-		    },{
-		    	field:'c1ucd',
-		    	title:'UCD',
-		    	sortable:true,
-		    	formatter:formatUCD
-		    },{
-			   	field: '_URI',
+			   	field: 'va_uri',
 		    	title: 'Options',
 		    	align: 'center',
 		    	formatter: formatEditColumn
@@ -546,17 +570,71 @@ $(document).ready(function(){
 			}
 		})
 	}//end function load ICD10
+	//set summary
+	function setSummary(va_array){
+		var timeStart,timeEnd;
+		setSummaryReset();
+		$.each(va_array,function(key,obj){
+			switch(obj.id){
+			case "ID00000":
+				$("#summary-va-type").text( obj.value );
+				break;
+			case "TIME_START":
+				$("#summary-int-start").text( obj.value );
+				timeStart = obj.value;
+				break;
+			case "TIME_END":
+				$("#summary-int-end").text( obj.value );
+				timeEnd = obj.value;
+				break;
+			case "ID10010":
+				$("#summary-int-name").text( obj.value );
+				break;
+			case "ID10010_PHONE":
+				$("#summary-int-phone").text( obj.value );
+				break;
+			case "ID10007":
+				$("#summary-res-name").text( obj.value );
+				break;
+			case "ID10007_PHONE":
+				$("#summary-res-phone").text( obj.value );
+				break;
+			case "ID10476":
+				$("#summary-narrative").text( obj.value );
+				break;
+			}
+		})
+		
+		//set time difference
+		setTimeDifference(timeStart,timeEnd);
+		
+	}
+	function setTimeDifference(tStart,tEnd){
+		 var d1 = new Date(tStart);
+		 var d2 = new Date(tEnd);
+		 var min =  Math.floor((d2 - d1)/(1000*60));
+		 
+		 $("#summary-int-time").text( min.toString() + " minutes" );
+	}
+	function setSummaryReset(){
+		$("#summary-va-type").text("");
+		$("#summary-int-start").text("");
+		$("#summary-int-end").text("");
+		$("#summary-int-name").text("");
+		$("#summary-int-phone").text("");
+	}
 	//Get VA
-	function getVAData(recid){
+	function getVAData(recid,tableid){
 		$.ajax({
 			url:"../UserMethods",
 			method:"post",
-			data:"rtype=3&uri="+recid,
+			data:"rtype=3&uri="+recid+"&tableid="+tableid,
 			dataType:"json",
 			success: function(data){
 				switch(vatype){
 				case 1:
 					vadata = renderWHOVA(data)
+					setSummary(vadata);
 					break
 				case 2:
 					vadata = renderSmartVA(data)
@@ -572,19 +650,20 @@ $(document).ready(function(){
 			}
 		});
 	}
-	function viewVAData(recid){
+	function viewVAData(recid,tableid){
 		$.ajax({
 			url:"../UserMethods",
 			method:"post",
-			data:"rtype=3&uri="+recid,
+			data:"rtype=3&uri="+recid+"&tableid="+tableid,
 			dataType:"json",
 			success: function(data){
 				switch(vatype){
 				case 1:
-					vadata = renderWHOVA(data)
+					vadata = renderWHOVA(data);
+					setSummary(vadata);
 					break
 				case 2:
-					vadata = renderSmartVA(data)
+					vadata = renderSmartVA(data);
 					break;
 				}
 				$("#tbl-va-view").bootstrapTable('destroy');
@@ -633,10 +712,10 @@ $(document).ready(function(){
 	}//end edit column function
 	
 	//Update table cell
-	function updateTableCell(index,cellid,cellval){
+	function updateTableCell(index,colid,cellval){
 		$("#tblVAData").bootstrapTable('updateCell', {
 			index: index,
-			field: cellid,
+			field: colid,
 			value: cellval
 		});
 	}

@@ -10,6 +10,7 @@ public class Settings {
 	public static String page_sub_title;
 	public static String va_type;
 	
+	public static boolean add_quotes;
 	public static String admin_level1;
 	public static String admin_level2;
 	public static String admin_level3;
@@ -43,6 +44,7 @@ public class Settings {
 		
 		//Load VA parameters
 		va_type = props.getProperty("app.va_type");
+		add_quotes = Boolean.parseBoolean(props.getProperty("app.add_quotes"));
 		
 		//Load structure
 		admin_level1 = props.getProperty("app.admin_level1");

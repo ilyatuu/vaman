@@ -52,7 +52,7 @@ public class UserMethods extends HttpServlet {
 	private Date date = new Date();
 	private String sqlDate = df.format(date);
        
-	private String recId,username,password,getType;
+	private String recId,tableId,username,password,getType;
 	private boolean rememberme;
     /**
      * @see HttpServlet#HttpServlet()
@@ -144,6 +144,7 @@ public class UserMethods extends HttpServlet {
 					json.put("fullname", user.getFullname());
 					json.put("message", user.getMessage());
 					json.put("sid", session.getId());
+					json.put("roleid", user.getRole());
 					
 					//If remember me is checked, set cookie
 					if(rememberme){
@@ -290,9 +291,11 @@ public class UserMethods extends HttpServlet {
 				break;
 			case 3: //get VA data
 				recId = request.getParameter("uri");
+				tableId = request.getParameter("tableid");
+				
 				va = new VA();
 				json = new JSONObject();
-				json = va.getVARec(recId);
+				json = va.getVARec(recId,tableId);
 				pw.print(json.toString());
 				
 				break;
@@ -300,6 +303,7 @@ public class UserMethods extends HttpServlet {
 				System.out.println("Assigning VA document to physician");
 				json = new JSONObject();
 				json.put("assignType",request.getParameter("assignType"));
+				json.put("va_table",request.getParameter("va_table"));
 				json.put("coderId", Integer.parseInt(request.getParameter("coderId")));
 				json.put("coderType", Integer.parseInt(request.getParameter("coderType")));
 

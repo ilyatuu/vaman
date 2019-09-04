@@ -88,11 +88,24 @@ public class GetChartData extends HttpServlet {
 		response.setContentType("application/json");
 		if(request.getParameterMap().containsKey("rtype")){
 			rtype = Integer.parseInt(request.getParameter("rtype"));
+			pw = response.getWriter();
 			switch(rtype){
 			case 1: //
 				//Print Results
-				pw = response.getWriter();
 				pw.print( getChartMonthly(jopt).toString() );
+				break;
+			case 12://
+				if(request.getParameterMap().containsKey("tblName"))
+					jopt.put("tblName",request.getParameter("tblName"));
+				
+				if(request.getParameterMap().containsKey("dateCol"))
+					jopt.put("dateCol",request.getParameter("dateCol"));
+				
+				if(request.getParameterMap().containsKey("intYear"))
+					jopt.put("intYear",request.getParameter("intYear"));
+				
+				pw.print( getChartMonthly2(jopt));
+				
 				break;
 			default:
 				break;
@@ -104,6 +117,74 @@ public class GetChartData extends HttpServlet {
 		//;
 	}
 
+	protected JSONObject getChartMonthly2(JSONObject opts) {
+		try{
+			query = "select 'Total Submission "+opts.getInt("intYear")+"' as title,";
+			query += "sum(case when extract(month from "+opts.getString("dateCol")+") = 1 then 1 else 0 end) \"jan\",";
+			query += "sum(case when extract(month from "+opts.getString("dateCol")+") = 2 then 1 else 0 end) \"feb\",";
+			query += "sum(case when extract(month from "+opts.getString("dateCol")+") = 3 then 1 else 0 end) \"mar\",";
+			query += "sum(case when extract(month from "+opts.getString("dateCol")+") = 4 then 1 else 0 end) \"apr\",";
+			query += "sum(case when extract(month from "+opts.getString("dateCol")+") = 5 then 1 else 0 end) \"may\",";
+			query += "sum(case when extract(month from "+opts.getString("dateCol")+") = 6 then 1 else 0 end) \"jun\",";
+			query += "sum(case when extract(month from "+opts.getString("dateCol")+") = 7 then 1 else 0 end) \"jul\",";
+			query += "sum(case when extract(month from "+opts.getString("dateCol")+") = 8 then 1 else 0 end) \"aug\",";
+			query += "sum(case when extract(month from "+opts.getString("dateCol")+") = 9 then 1 else 0 end) \"sep\",";
+			query += "sum(case when extract(month from "+opts.getString("dateCol")+") = 10 then 1 else 0 end) \"oct\",";
+			query += "sum(case when extract(month from "+opts.getString("dateCol")+") = 11 then 1 else 0 end) \"nov\",";
+			query += "sum(case when extract(month from "+opts.getString("dateCol")+") = 12 then 1 else 0 end) \"dec\" ";
+			query += "from "+opts.getString("tblName");
+			query += " where extract(year from "+opts.getString("dateCol")+")="+opts.getInt("intYear")+";";
+			
+			db = new DbConnect();
+			cnn = db.getConn();
+			pstm = cnn.prepareStatement(query);
+			
+			rset = pstm.executeQuery();
+			columns = rset.getMetaData();
+			
+			jarr2 = new JSONArray();
+			for (int i=2;i<=columns.getColumnCount();i++){
+				jarr2.put(columns.getColumnLabel(i));
+			}
+			
+			jobj = new JSONObject();
+			while(rset.next()){
+				//Get dataset name
+				
+				jobj.put("title", rset.getObject(1));
+				jobj.put("labels", jarr2);
+				
+				//Get dataset values
+				jarr3 = new JSONArray();
+				for (int i=2;i<=columns.getColumnCount();i++){
+					jarr3.put(rset.getObject(i));
+				}
+				jobj.put("data", jarr3);
+			}
+			json = new JSONObject();
+			json.put("dataset", jobj);
+			
+			return json;
+		}catch(SQLException e){
+			e.printStackTrace();
+			return null;
+		}catch(Exception e){
+			e.printStackTrace();
+			return null;
+		}finally{
+			try{
+		         if(pstm!=null)
+		            cnn.close();
+		      }catch(SQLException se){
+		      }// do nothing
+		      try{
+		         if(cnn!=null)
+		            cnn.close();
+		      }catch(SQLException se){
+		         se.printStackTrace();
+		      }//end finally try
+		}
+	}
 	protected JSONObject getChartMonthly( JSONObject opts){
 		try{
 			query = "select 'Total Submission' as dataset,";
