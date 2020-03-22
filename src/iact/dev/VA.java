@@ -384,6 +384,55 @@ public class VA {
 		}
 		return null;
 	}
+	public JSONObject getCodedVAAll(String tblName) {
+		try {
+			sql  = " select va_uri,icdname";
+			sql += " from _web_assignment a";
+			sql += " left join _web_icd10 on _web_icd10.id = returnunderline(coder1_coda,coder1_codb,coder1_codc,coder1_codd)";
+			sql += " where returnunderline(coder1_coda,coder1_codb,coder1_codc,coder1_codd) = returnunderline(coder2_coda,coder2_codb,coder2_codc,coder2_codd)";
+			sql += " and va_table=?";
+			
+			db = new DbConnect();
+			cnn = db.getConn();
+			pstm = cnn.prepareStatement(sql);
+			pstm.setString(1, tblName);
+			rset = pstm.executeQuery();
+			columns = rset.getMetaData();
+			jarr = new JSONArray();
+			
+			int rowCount=0;
+			while(rset.next()) {
+				rowCount++;
+				jobj = new JSONObject();
+				for (int i=1;i<=columns.getColumnCount();i++){
+					colname = columns.getColumnName(i);
+					jobj.put( colname, rset.getObject(i));
+				}
+				jarr.put(jobj);
+			}
+			json = new JSONObject();
+			json.put("total", rowCount);
+			json.put("rows", jarr);
+			return json;
+		}catch(SQLException e){
+			e.printStackTrace();
+		}catch(Exception e){
+			e.printStackTrace();
+		}finally{
+			try{
+		         if(pstm!=null)
+		            pstm.close();
+		      }catch(SQLException se){
+		      }// do nothing
+		      try{
+		         if(cnn!=null)
+		            cnn.close();
+		      }catch(SQLException se){
+		         se.printStackTrace();
+		      }//end finally try
+		}
+		return null;
+	}
 	public boolean AssignVA(JSONObject vaObj){
 		try{
 			if(vaObj.getInt("coderType")==1){

@@ -145,6 +145,11 @@ public class VAMethods extends HttpServlet {
 				
 				pw.print(json);
 				break;
+			case 62:
+				tblName = request.getParameter("tblName");
+				vas = new VA();
+				pw.print(vas.getCodedVAAll(tblName));
+				break;
 			}
 		}catch(Exception e){
 			e.printStackTrace();

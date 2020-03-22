@@ -52,7 +52,7 @@ public class UserMethods extends HttpServlet {
 	private Date date = new Date();
 	private String sqlDate = df.format(date);
        
-	private String recId,tableId,username,password,getType;
+	private String recId,tableId,username,password;
 	private boolean rememberme;
     /**
      * @see HttpServlet#HttpServlet()
@@ -68,42 +68,6 @@ public class UserMethods extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		// Authenticate mobile users
-		//Sample get http://localhost:8183/crvs/UserMethods?Type=Login&username=ilyatuu&password=password
-		try{
-			response.setContentType("application/json");
-			pw = response.getWriter();
-			if(request.getParameterMap().containsKey("Type")){
-				getType = request.getParameter("Type");
-				switch(getType){
-				case "Login":
-					json = new JSONObject();
-					if(request.getParameterMap().containsKey("username") && request.getParameterMap().containsKey("password")){
-						username = request.getParameter("username");
-						password = request.getParameter("password");
-						user = Login(username,password);
-						
-						json.put("isAuthenticated", user.isAuthenticated());
-						json.put("fullname", user.getFullname());
-						json.put("return_message", user.getMessage());
-						pw.print(json);
-					}else{
-						json.put("return_message", "username or password not provided");
-						pw.print(json);
-					}
-					break;
-				case "Session":
-					request.getSession();
-					break;
-				default:
-					break;
-				}
-			}else{
-				pw.print("Invalid request");
-			}
-			
-		}catch(Exception e){
-			e.printStackTrace();
-		}
 	}
 
 	/**

@@ -101,6 +101,9 @@ public class GetChartData extends HttpServlet {
 				if(request.getParameterMap().containsKey("dateCol"))
 					jopt.put("dateCol",request.getParameter("dateCol"));
 				
+				if(request.getParameterMap().containsKey("dateDoD"))
+					jopt.put("dateDoD",request.getParameter("dateDoD"));
+				
 				if(request.getParameterMap().containsKey("intYear"))
 					jopt.put("intYear",request.getParameter("intYear"));
 				
@@ -119,7 +122,7 @@ public class GetChartData extends HttpServlet {
 
 	protected JSONObject getChartMonthly2(JSONObject opts) {
 		try{
-			query = "select 'Total Submission "+opts.getInt("intYear")+"' as title,";
+			query = "select 'Total VA Submission' as title,";
 			query += "sum(case when extract(month from "+opts.getString("dateCol")+") = 1 then 1 else 0 end) \"jan\",";
 			query += "sum(case when extract(month from "+opts.getString("dateCol")+") = 2 then 1 else 0 end) \"feb\",";
 			query += "sum(case when extract(month from "+opts.getString("dateCol")+") = 3 then 1 else 0 end) \"mar\",";
@@ -161,6 +164,40 @@ public class GetChartData extends HttpServlet {
 				}
 				jobj.put("data", jarr3);
 			}
+			
+			// Get summary based on DoD
+			query = "select 'Total Deaths "+opts.getInt("intYear")+"' as title,";
+			query += "sum(case when extract(month from "+opts.getString("dateDoD")+"::date) = 1 then 1 else 0 end) \"jan\",";
+			query += "sum(case when extract(month from "+opts.getString("dateDoD")+"::date) = 2 then 1 else 0 end) \"feb\",";
+			query += "sum(case when extract(month from "+opts.getString("dateDoD")+"::date) = 3 then 1 else 0 end) \"mar\",";
+			query += "sum(case when extract(month from "+opts.getString("dateDoD")+"::date) = 4 then 1 else 0 end) \"apr\",";
+			query += "sum(case when extract(month from "+opts.getString("dateDoD")+"::date) = 5 then 1 else 0 end) \"may\",";
+			query += "sum(case when extract(month from "+opts.getString("dateDoD")+"::date) = 6 then 1 else 0 end) \"jun\",";
+			query += "sum(case when extract(month from "+opts.getString("dateDoD")+"::date) = 7 then 1 else 0 end) \"jul\",";
+			query += "sum(case when extract(month from "+opts.getString("dateDoD")+"::date) = 8 then 1 else 0 end) \"aug\",";
+			query += "sum(case when extract(month from "+opts.getString("dateDoD")+"::date) = 9 then 1 else 0 end) \"sep\",";
+			query += "sum(case when extract(month from "+opts.getString("dateDoD")+"::date) = 10 then 1 else 0 end) \"oct\",";
+			query += "sum(case when extract(month from "+opts.getString("dateDoD")+"::date) = 11 then 1 else 0 end) \"nov\",";
+			query += "sum(case when extract(month from "+opts.getString("dateDoD")+"::date) = 12 then 1 else 0 end) \"dec\" ";
+			query += "from "+opts.getString("tblName");
+			query += " where extract(year from "+opts.getString("dateDoD")+"::date)="+opts.getInt("intYear")+";";
+			
+			if(cnn.isClosed()) {
+				db = new DbConnect();
+				cnn = db.getConn();
+			}
+			pstm = cnn.prepareStatement(query);
+			rset = pstm.executeQuery();
+			columns = rset.getMetaData();
+			while(rset.next()){
+				jarr3 = new JSONArray();
+				for (int i=2;i<=columns.getColumnCount();i++){
+					jarr3.put(rset.getObject(i));
+				}
+				jobj.put("data2", jarr3);
+			}
+			/////////
+			
 			json = new JSONObject();
 			json.put("dataset", jobj);
 			

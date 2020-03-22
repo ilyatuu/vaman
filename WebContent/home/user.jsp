@@ -226,7 +226,6 @@
 			<div class="panel panel-default">
 			<div class="panel-heading has-padding">
 				<div class="row">
-					
 					<div class="col-sm-4"><h5>List of VA Records</h5></div>
 					<div class="col-sm-4 text-right"><h6>Select Table:</h6></div>
 					<div class="col-sm-4">

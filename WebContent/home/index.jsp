@@ -84,7 +84,7 @@ if(!session.isNew() && session.getAttribute("username") != null){
 <!-- page header -->
 <div class="container-fluid">
 <div class="page-header">
-	<div class="row" style="margin-top:5px;">
+	<div class="row">
 		<div class="col-sm-2 col-md-2 visible-lg visible-md">
 			<img src="../images/logo.svg" alt="CRVS Logo" class="img-responsive">
 			<!-- image size is 94px X 80px -->
@@ -120,6 +120,12 @@ if(!session.isNew() && session.getAttribute("username") != null){
 			</ul>
 		</li>
 		<li>
+			<a href="#" class="expand"><i class="fa fa-map"></i>Maps</a>
+			<ul id="myGraphs">
+				<li><a href="#" id="open_maps">Go to Maps</a></li>
+			</ul>
+		</li>
+		<li>
 			<a href="#" class="expand"><i class="fa fa-cogs"></i>Settings</a>
 			<ul>
 				<li><a href="#" id="uprofile"><i class="fa fa-address-card-o"></i>Update Profile</a></li>
@@ -142,9 +148,11 @@ if(!session.isNew() && session.getAttribute("username") != null){
 						out.print("<li><a href='#' id='upload_csmf'><i class='fa fa-upload'></i>Upload CSMF</a></li>");
 						out.print("<li><a href='#' id='usrmgr'><i class='fa fa-users'></i>System Users</a></li>");
 						out.print("<li><a href='#' id='icd10list'><i class='fa fa-book'></i>ICD10 List</a></li>");
+						out.print("<li><a href='#' id='settings'><i class='fa fa-cog'></i>Settings</a></li>");
+						out.print("<li><a href='#' id='download'><i class='fa fa-download'></i>Download Data</a></li>");
 						break;
 					}
-					out.print("<li><a href='#' id='download'><i class='fa fa-download'></i>Download Data</a></li>");
+					
 				%>
 				
 			</ul>
@@ -153,7 +161,7 @@ if(!session.isNew() && session.getAttribute("username") != null){
 </div>
 <!-- /side bar -->
 <!-- page content -->
-<div class="page-content">
+<div id="page-content" class="page-content">
 
 <!-- nav tabs -->
 <div id="tab-list">
@@ -403,7 +411,7 @@ if(!session.isNew() && session.getAttribute("username") != null){
 							<button id="btnYearPrev1" class="btn btn-default">
 								<i class="glyphicon glyphicon-chevron-left"></i> Prev
 							</button>
-							<input type="text" class="form-control" id="txtYear1" value="2019"
+							<input type="text" class="form-control" id="txtYear1" value="2020"
 								size=4 style="text-align: center" readonly>
 							<button id="btnYearNext1" class="btn btn-default">
 								Next <i class="glyphicon glyphicon-chevron-right"></i>
@@ -435,7 +443,7 @@ if(!session.isNew() && session.getAttribute("username") != null){
 							<button id="graphYearPrev1" class="btn btn-default">
 								<i class="glyphicon glyphicon-chevron-left"></i> Prev
 							</button>
-							<input type="text" class="form-control" id="graphYear1" value="2019"
+							<input type="text" class="form-control" id="graphYear1" value="2020"
 								size=4 style="text-align: center" readonly>
 							<button id="graphYearNext1" class="btn btn-default">
 								Next <i class="glyphicon glyphicon-chevron-right"></i>
@@ -580,7 +588,7 @@ if(!session.isNew() && session.getAttribute("username") != null){
 							<button id="btnYearPrev2" class="btn btn-default">
 								<i class="glyphicon glyphicon-chevron-left"></i> Prev
 							</button>
-							<input type="text" class="form-control" id="txtYear2" value="2019"
+							<input type="text" class="form-control" id="txtYear2" value="2020"
 								size=4 style="text-align: center" readonly>
 							<button id="btnYearNext2" class="btn btn-default">
 								Next <i class="glyphicon glyphicon-chevron-right"></i>
@@ -612,7 +620,7 @@ if(!session.isNew() && session.getAttribute("username") != null){
 							<button id="graphYearPrev2" class="btn btn-default">
 								<i class="glyphicon glyphicon-chevron-left"></i> Prev
 							</button>
-							<input type="text" class="form-control" id="graphYear2" value="2019"
+							<input type="text" class="form-control" id="graphYear2" value="2020"
 								size=4 style="text-align: center" readonly>
 							<button id="graphYearNext2" class="btn btn-default">
 								Next <i class="glyphicon glyphicon-chevron-right"></i>
@@ -757,7 +765,7 @@ if(!session.isNew() && session.getAttribute("username") != null){
 							<button id="btnYearPrev3" class="btn btn-default">
 								<i class="glyphicon glyphicon-chevron-left"></i> Prev
 							</button>
-							<input type="text" class="form-control" id="txtYear3" value="2019"
+							<input type="text" class="form-control" id="txtYear3" value="2020"
 								size=4 style="text-align: center" readonly>
 							<button id="btnYearNext3" class="btn btn-default">
 								Next <i class="glyphicon glyphicon-chevron-right"></i>
@@ -790,7 +798,7 @@ if(!session.isNew() && session.getAttribute("username") != null){
 							<button id="graphYearPrev3" class="btn btn-default">
 								<i class="glyphicon glyphicon-chevron-left"></i> Prev
 							</button>
-							<input type="text" class="form-control" id="graphYear3" value="2019"
+							<input type="text" class="form-control" id="graphYear3" value="2020"
 								size=4 style="text-align: center" readonly>
 							<button id="graphYearNext3" class="btn btn-default">
 								Next <i class="glyphicon glyphicon-chevron-right"></i>
@@ -1024,16 +1032,21 @@ if(!session.isNew() && session.getAttribute("username") != null){
 <script type="text/javascript" src="../js/plugins/interface/collapsible.min.js"></script>
 <script type="text/javascript" src="../js/plugins/interface/tableExport.min.js"></script>
 
+
 <script type="text/javascript" src="../js/plugins/forms/select2.min.js"></script>
 <script type="text/javascript" src="../js/bootstrap.min.js"></script>
 <script type="text/javascript" src="../js/mapping-whova.js"></script>
 <script type="text/javascript" src="../js/mapping-smartva.js"></script>
 
 <script type="text/javascript" src="charts/chart.min.js"></script>
+
+<!-- Maps API -->
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB3_DTfoa67pA6kh6Azrzkc1l2PfPNzZl0"></script>
+
 <script>
 $(document).ready(function(){
 	var isLoading;
-	var maxYear = 2019;
+	var maxYear = 2020;
 	var minYear = 2017;
 	var dataModel;
 	
@@ -1047,6 +1060,8 @@ $(document).ready(function(){
 	var admin_level1 = <%=Settings.admin_level1%>;
 	var admin_level2 = <%=Settings.admin_level2%>;
 	var admin_level3 = <%=Settings.admin_level3%>;
+	
+	var months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
 	
 	
 	var gRequestData = {
@@ -1560,7 +1575,8 @@ $(document).ready(function(){
 				colGAcc:'"RESPONDENT_BACKGR_GPS_LOCATION_ACC"',
 				colIntv:'"RESPONDENT_BACKGR_GROUP_INTERVIEWER_ID10010A"',
 				colReg :'"CONSNTED_DECEASED_CRVS_INFO_ON_DECEASED_ID10057_GRUP_ID10057_R"',
-				colDist:'"CONSNTED_DECEASED_CRVS_INFO_ON_DECEASED_ID10057_GRUP_ID10057_D"'
+				colDist:'"CONSNTED_DECEASED_CRVS_INFO_ON_DECEASED_ID10057_GRUP_ID10057_D"',
+				colDoD:'"CONSENTED_DECEASED_CRVS_INFO_ON_DECEASED_ID10023"'
 		      };
 			  
 			  columns1 = [
@@ -1577,6 +1593,7 @@ $(document).ready(function(){
 			  //graph request data
 			  gRequestData.tblName = opts.tblName;
 			  gRequestData.dateCol = opts.colDate;
+			  gRequestData.dateDoD = opts.colDoD;
 			  
 			  loadData(opts.tblName,opts.colDate,columns1,opts.tabId);
 			  loadInterviewerSummary(opts.tblName,opts.colIntv,columns2,opts.colDate,opts.tabId);
@@ -1592,7 +1609,8 @@ $(document).ready(function(){
 				  colGAcc:'"GPS_LOCATION_ACC"',
 				  colIntv:'"RESPONDENT_BACKGR_ID10010"',
 				  colReg :'"RESPONDENT_BACKGR_ID10005_R"',
-				  colDist:'"RESPONDENT_BACKGR_ID10005_D"'	  
+				  colDist:'"RESPONDENT_BACKGR_ID10005_D"',
+				  colDoD:'"CONSENTED_DECEASED_CRVS_INFO_ON_DECEASED_ID10023"'
 		  	  };
 			  
 			  columns1 = [
@@ -1609,6 +1627,7 @@ $(document).ready(function(){
 			  //graph request data
 			  gRequestData.tblName = opts.tblName;
 			  gRequestData.dateCol = opts.colDate;
+			  gRequestData.dateDoD = opts.colDoD;
 			  
 			  loadData(opts.tblName,opts.colDate,columns1,opts.tabId);
 			  loadInterviewerSummary(opts.tblName,opts.colIntv,columns2,opts.colDate,opts.tabId);
@@ -1623,7 +1642,8 @@ $(document).ready(function(){
 			    colGAcc:'"GPS_LOCATION_ACC"',
 			    colIntv:'"RESPONDENT_BACKGR_ID10010"',
 			    colReg :'"RESPONDENT_BACKGR_ID10005_R"',
-			    colDist:'"RESPONDENT_BACKGR_ID10005_D"'
+			    colDist:'"RESPONDENT_BACKGR_ID10005_D"',
+			    colDoD:'"CONSENTED_DECEASED_CRVS_INFO_ON_DECEASED_ID10023"'
 		  	  }
 			  //dataModel = getDataModel(tblName);
 			  columns1 = [
@@ -1640,6 +1660,7 @@ $(document).ready(function(){
 			  
 			  gRequestData.tblName = opts.tblName;
 			  gRequestData.dateCol = opts.colDate;
+			  gRequestData.dateDoD = opts.colDoD;
 			  
 			  loadData(opts.tblName,opts.colDate,columns1,opts.tabId);
 			  loadInterviewerSummary(opts.tblName,opts.colIntv,columns2,opts.colDate,opts.tabId);
@@ -1871,17 +1892,17 @@ $(document).ready(function(){
 							visible:true
 						},{
 							field:"adult",
-							title:"Adult VA",
+							title:"Adult VAs",
 							visible:true,
 							align:"right"
 						},{
 							field:"child",
-							title:"Child VA",
+							title:"Child VAs",
 							visible:true,
 							align:"right"
 						},{
 							field:"neonatal",
-							title:"Neonatal VA",
+							title:"Neonatal VAs",
 							visible:true,
 							align:"right"
 						},{
@@ -1964,6 +1985,14 @@ $(document).ready(function(){
 	$("#create_table").click(function(){
 		//$("#mainpanel").load("tables.jsp");
 	});
+	
+	//Maps
+	$("#open_maps").click(function(e){
+		e.preventDefault();
+		$("#page-content").empty();
+		$("#page-content").load("maps/index.jsp");
+	});
+	
 	$("#uprofile").click(function(e){
 		e.preventDefault();
 		$("#page-content-home").empty();
@@ -1992,7 +2021,11 @@ $(document).ready(function(){
 		$("#page-content-home").empty();
 		$("#page-content-home").load("download.jsp", function(){});
 	})
-	
+	$("#settings").click(function(e){
+		e.preventDefault();
+		$("#page-content-home").empty();
+		$("#page-content-home").load("settings.jsp", function(){});
+	})
 	//Link Add table
 	$("#link_addcontent").click(function(){
 		//$("#div_createtable").modal("show");
@@ -2104,7 +2137,7 @@ $(document).ready(function(){
 		var pCh = percent(child,tot);
 		var pNe = percent(neonate,tot);
 		var d1 = [[1,pAd],[2,pCh],[3,pNe]];
-		var xl = [[1,"Adult VA"],[2,"Child VA"],[3,"Neonatal VA"]];
+		var xl = [[1,"Adult VAs"],[2,"Child VAs"],[3,"Neonatal VAs"]];
 		
 		//var d1 = [];
 	    //for (var i = 0; i <= 10; i += 1)
@@ -2132,7 +2165,7 @@ $(document).ready(function(){
 			      	clickable: true
 			},
 			xaxis:{
-			 	axisLabel:"VA Type",
+			 	axisLabel:"VAs Age Groups",
 		   		ticks: xl,
 		    	axisLabelPadding: 5
 		    }	
@@ -2179,23 +2212,40 @@ $(document).ready(function(){
 		var ctx = document.getElementById("chartMonthly"+tabId).getContext("2d");	
 		var dataset = rdata.dataset;
 		graphdata = {
-				  labels: dataset.labels,
+				  //labels: dataset.labels, //use labels defined here instead. 
+				  labels:months,
 				  datasets: [{
 				    label: dataset.title,
-				    backgroundColor: "rgba(255,99,132,0.2)",
-				    borderColor: "rgba(255,99,132,1)",
+				    backgroundColor: "rgba(25,181,254,0.2)",
+				    borderColor: "rgba(44,130,201,1)",
 				    borderWidth: 2,
-				    hoverBackgroundColor: "rgba(255,99,132,0.4)",
-				    hoverBorderColor: "rgba(255,99,132,1)",
+				    hoverBackgroundColor: "rgba(58,83,155,0.4)",
+				    hoverBorderColor: "rgba(44,130,201,1)",
 				    data: dataset.data
+				  },{
+					    label: "Total Deaths",
+					    backgroundColor: "rgba(255,99,132,0.2)",
+					    borderColor: "rgba(255,99,132,1)",
+					    borderWidth: 2,
+					    hoverBackgroundColor: "rgba(255,99,132,0.4)",
+					    hoverBorderColor: "rgba(255,99,132,1)",
+					    data: dataset.data2
 				  }]
 		};
 		graphoptions = {
 				  maintainAspectRatio: false,
-				  legend: {position:'top',display:false},
+				  legend: {
+					  noColumns:1,
+					  labelBoxBorderColor:"none",
+					  position:'right' },
+				  grid:{
+					  hoverable:true,
+					  clickable:false,
+					  borderWidth:1  
+				  },
 				  title: {
 					display:true,
-					text:'VA Submission Summary '
+					text:'Data Collection Summary'
 				  },
 				  scales: {
 				    yAxes: [{
@@ -2227,15 +2277,24 @@ $(document).ready(function(){
 			dataType:"json",
 			success: function(rdata){
 				graphdata = {
-						  labels: rdata.dataset.labels,
+						  //labels: rdata.dataset.labels,
+						  labels:months,
 						  datasets: [{
-						    label: rdata.dataset.name,
-						    backgroundColor: "rgba(255,99,132,0.2)",
-						    borderColor: "rgba(255,99,132,1)",
+						    label: rdata.dataset.title,
+						    backgroundColor: "rgba(25,181,254,0.2)",
+						    borderColor: "rgba(44,130,201,1)",
 						    borderWidth: 2,
-						    hoverBackgroundColor: "rgba(255,99,132,0.4)",
-						    hoverBorderColor: "rgba(255,99,132,1)",
+						    hoverBackgroundColor: "rgba(25,181,254,0.4)",
+						    hoverBorderColor: "rgba(44,130,201,1)",
 						    data: rdata.dataset.data
+						  },{
+							  label: "Total Deaths",
+							    backgroundColor: "rgba(255,99,132,0.2)",
+							    borderColor: "rgba(255,99,132,1)",
+							    borderWidth: 2,
+							    hoverBackgroundColor: "rgba(255,99,132,0.4)",
+							    hoverBorderColor: "rgba(255,99,132,1)",
+							    data: rdata.dataset.data2
 						  }]
 				};
 				myChart.config.data = graphdata;

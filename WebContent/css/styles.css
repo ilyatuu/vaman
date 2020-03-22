@@ -45,7 +45,6 @@
     font-weight: 700;
     src: local('Cuprum Regular'), local('Cuprum-Regular'), url(fonts/Cuprum/Cuprum-Regular.ttf) format('truetype');
 }
-
 /* output va screen */
 .va-id{
 	margin-top:3px;

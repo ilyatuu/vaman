@@ -8,7 +8,21 @@
 <%@ page import="iact.dev.Settings" %>
 </head>
 <body>
-<!-- first row -->
+<!-- first row - select table -->
+<div class="row has-padding">			
+		<div class="col-sm-2 text-right"><h6>Select Source Table:</h6></div>
+		<div class="col-sm-4">
+		<select id="va_table" name="va_table" class="select2_ctl" style="width : 100%;">
+			<option value='none'> - - </option>
+          	<option value='"WHOVAV14TZ_CORE2"'>10 Wards</option>
+          	<option value='"WHOVA151_CORE"'>Iringa</option>
+          	<option value='"HIA4SD_CORE"'>HIA4SD Project</option>
+        </select>
+	</div>					
+</div>
+<!-- end of first row -->
+
+<!-- second row -->
 <div class="row">
 	<div class="col-sm-6">
 		<div class="panel panel-default">
@@ -47,8 +61,8 @@
 		</div>
 	</div>
 </div>
-<!-- end first row -->
-<!-- second row -->
+<!-- end second row -->
+<!-- third row -->
 <div class="row">
 <div class="col-sm-12">
 <div class="panel panel-default">
@@ -90,15 +104,41 @@
 </div>
 </div>
 </div>
-<!-- end second row -->
+<!-- end third row -->
 <script type="text/javascript">
 $(document).ready(function(){
 
+	// Costmetic Settings : not activated
+	$(".select2_ctl").select2({
+		minimumResultsForSearch: Infinity
+	});
 	
+	
+	//
 	var interviewers_name_table = <%=Settings.interviewers_name_table%>;
 	var interviewers_name_column = <%=Settings.interviewers_name_column%>;
 	var interviewers_phone_column = <%=Settings.interviewers_phone_column%>;
 	
+	
+	//Update source table
+	
+	$("#va_table").on("change",function(e){
+		//this is not functional yet
+		switch(e.target.value){
+		case '"WHOVAV14TZ_CORE2"':
+			interviewers_name_table = <%=Settings.interviewers_name_table%>;
+			interviewers_name_column = <%=Settings.interviewers_name_column%>;
+			break;
+		case '"WHOVA151_CORE"':
+			interviewers_name_table = '"WHOVA151_CORE"';
+			interviewers_name_column = '"RESPONDENT_BACKGR_ID10010"';
+			break;
+		case '"HIA4SD_CORE"':
+			interviewers_name_table = '"HIA4SD_CORE"';
+			interviewers_name_column = '"RESPONDENT_BACKGR_ID10010"';
+			break;
+		}
+	})
 	
 	//Chart area
 	var myChart;
@@ -110,7 +150,7 @@ $(document).ready(function(){
 	$table2 = $("#tblInterviewer2");
 	$table3 = $("#tblInterviewer3");
 	
-	initSummar();
+	initSummary();
 	initChart()
 	
 	
@@ -286,7 +326,7 @@ $(document).ready(function(){
 			}
 		});
 	}
-	function initSummar(){
+	function initSummary(){
 		var postdata = {
 				rtype:101,
 				tablename:interviewers_name_table,

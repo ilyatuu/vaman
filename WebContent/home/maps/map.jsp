@@ -11,66 +11,56 @@
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB3_DTfoa67pA6kh6Azrzkc1l2PfPNzZl0"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
 <script>
-function initMap() {
-	  var mapCanvas = document.getElementById("map");
-	  var location = new google.maps.LatLng(-6, 35)
-	  var mapOptions = {
-	    center: location, 
-	    zoom: 5,
-	    mapTypeId: 'terrain',
-	    styles:[{
-	    	featureType: "all",
-	    	elementType: "labels",
-	    	stylers:[{
-	    		visibility:"off"
-	    	}]
-	    }]
-	  };
-	  var map = new google.maps.Map(mapCanvas, mapOptions);
-	//Draw Location circles
-	  var markerImage = '../images/sort_asc.png';
-	  var deathLocs ={
-	 	loc1:{
-	 		center:{lat: -6.8333303, lng: 37.6525151},
-	 		population:100000,
-	 		title:'Location1',
-	 		text:'Location: Morogoro <br />Total Events 233 <br />Last Event: 9/11/2007'
-	 	},
-	 	loc2:{
-	 		center:{lat: -7.3663408, lng: 39.0650173},
-	 		population:200000,
-	 		title:'Location2',
-	 		text:'Location: Pwani <br />Total Events 209 <br />Last Event: 28/11/2007'
-	 	},
-	 	loc3:{
-	 		center:{lat: -5.2870652, lng: 38.951072},
-	 		population:200000,
-	 		title:'Location2',
-	 		text:'Location: Tanga <br />Total Events 199 <br />Last Event: 3/12/2007'
-	 	}
-	  };
-	  
-	  for (var loc in deathLocs){
-		  var marker = new google.maps.Marker({
-		      position: deathLocs[loc].center,
-		      map: map,
-		      icon: markerImage,
-		      text: deathLocs[loc].text
-		  });
-		  
-		  var infowindow = new google.maps.InfoWindow({
-		      content: deathLocs[loc].text,
-		      maxWidth: 100
-		  });
-		  
-		  google.maps.event.addListener(marker,'click', function () {
-			  //infowindow.open(map, marker);
-			  infowindow.setContent(this.text);
-			  infowindow.open(map, this);
-		  });
-	  }
-	  google.maps.event.addDomListener(window, 'load', initMap);
-	}
+	var markerImage = "../../images/sort_asc.png";
+	var iringa = new google.maps.LatLng(-7.8, 36)
+    var returnGoogleLatLng = function(point) {
+        return new google.maps.LatLng(
+          point.latitude,
+          point.longitude
+        );
+    };
+    
+    var icon = {
+    	url: "http://maps.google.com/mapfiles/ms/icons/red-dot.png", // url
+    	scaledSize: new google.maps.Size(15, 15), // scaled size
+    	origin: new google.maps.Point(0,0), // origin
+    	anchor: new google.maps.Point(0, 0) // anchor
+    };
+    
+    var drawMarker = function(map, point) {
+        var marker = new google.maps.Marker({
+          map: map,
+          position: returnGoogleLatLng(point),
+          title: point.id,
+          icon:icon
+        });
+    };
+    
+    var drawPoints = function(points) {
+        var map = new google.maps.Map(document.getElementById('map-canvas'), {
+          center: iringa,
+          zoom: 8
+        });
+        for (var i = 0; i < points.length; i++) {
+          drawMarker(map, points[i]);
+        }
+    };
+    
+    $(document).ready(function() {
+    	navigator.geolocation.getCurrentPosition(function() {
+    		$.ajax({
+    			url:"../../Maps",
+    			method:"POST",
+    			header:"application/json",
+    			data:{
+    				rtype:1
+    			},success:function(data){
+    				drawPoints(data)
+    			}
+    		});
+    	});
+    });
+	
 </script>
 </body>
 </html>
