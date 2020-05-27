@@ -52,7 +52,7 @@ public class UserMethods extends HttpServlet {
 	private Date date = new Date();
 	private String sqlDate = df.format(date);
        
-	private String recId,username,password,getType;
+	private String recId,tableId,username,password;
 	private boolean rememberme;
     /**
      * @see HttpServlet#HttpServlet()
@@ -68,42 +68,6 @@ public class UserMethods extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		// Authenticate mobile users
-		//Sample get http://localhost:8183/crvs/UserMethods?Type=Login&username=ilyatuu&password=password
-		try{
-			response.setContentType("application/json");
-			pw = response.getWriter();
-			if(request.getParameterMap().containsKey("Type")){
-				getType = request.getParameter("Type");
-				switch(getType){
-				case "Login":
-					json = new JSONObject();
-					if(request.getParameterMap().containsKey("username") && request.getParameterMap().containsKey("password")){
-						username = request.getParameter("username");
-						password = request.getParameter("password");
-						user = Login(username,password);
-						
-						json.put("isAuthenticated", user.isAuthenticated());
-						json.put("fullname", user.getFullname());
-						json.put("return_message", user.getMessage());
-						pw.print(json);
-					}else{
-						json.put("return_message", "username or password not provided");
-						pw.print(json);
-					}
-					break;
-				case "Session":
-					request.getSession();
-					break;
-				default:
-					break;
-				}
-			}else{
-				pw.print("Invalid request");
-			}
-			
-		}catch(Exception e){
-			e.printStackTrace();
-		}
 	}
 
 	/**
@@ -144,6 +108,7 @@ public class UserMethods extends HttpServlet {
 					json.put("fullname", user.getFullname());
 					json.put("message", user.getMessage());
 					json.put("sid", session.getId());
+					json.put("roleid", user.getRole());
 					
 					//If remember me is checked, set cookie
 					if(rememberme){
@@ -290,9 +255,11 @@ public class UserMethods extends HttpServlet {
 				break;
 			case 3: //get VA data
 				recId = request.getParameter("uri");
+				tableId = request.getParameter("tableid");
+				
 				va = new VA();
 				json = new JSONObject();
-				json = va.getVARec(recId);
+				json = va.getVARec(recId,tableId);
 				pw.print(json.toString());
 				
 				break;
@@ -300,6 +267,7 @@ public class UserMethods extends HttpServlet {
 				System.out.println("Assigning VA document to physician");
 				json = new JSONObject();
 				json.put("assignType",request.getParameter("assignType"));
+				json.put("va_table",request.getParameter("va_table"));
 				json.put("coderId", Integer.parseInt(request.getParameter("coderId")));
 				json.put("coderType", Integer.parseInt(request.getParameter("coderType")));
 

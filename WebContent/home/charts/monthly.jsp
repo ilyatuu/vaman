@@ -45,21 +45,22 @@ $(document).ready(function(){
 	//Get graph data and also draw graph
 	getGraphData();
 	
-	$("#btnGraphYearNext").click(function(e){
-		if( $("#txtGraphYear").val()=="2017" ){
-			$("#txtGraphYear").val("2018")
+	$("#btnGraphYearNext").click(function(e){		
+		if( +$("#txtGraphYear").val()+1 > "2019" ){
+			return;
 		}else{
-			$("#txtGraphYear").val("2017")
+			$("#txtGraphYear").val( +$("#txtGraphYear").val()+1 )
 		}
 		//Refresh graph
 		postdata.wherevalue = $("#txtGraphYear").val();
 		updateGraph(postdata);
 	})
 	$("#btnGraphYearPrev").click(function(){
-		if( $("#txtGraphYear").val()=="2018" ){
-			$("#txtGraphYear").val("2017")
+		
+		if( +$("#txtGraphYear").val() - 1 < 2017 ){
+			return;
 		}else{
-			$("#txtGraphYear").val("2018")
+			$("#txtGraphYear").val(+$("#txtGraphYear").val() - 1)
 		}
 		//Refresh graph
 		postdata.wherevalue = $("#txtGraphYear").val();

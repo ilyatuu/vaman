@@ -9,10 +9,30 @@
  * This is a mapping file that uses smartVA ID's and return label and value. 
  * The input is a json structure from the ODK
  * */
-function renderWHOVA(va_data_in_json){
+function renderWHOVA(va_data_in_json, truncated=true){
 	var va_arr = [];
 	$.each(va_data_in_json,function(key,value){
-		switch(key){
+		
+		//if not truncated, then truncate
+		if(!truncated){
+			if(key.indexOf("_ID") > 0){
+				key = key.substring(key.indexOf("_ID")+1, key.length);
+			}
+			if(key.indexOf("_AGE") > 0){
+				key = key.substring(key.indexOf("_AGE")+1, key.length);
+			}
+			if(key.indexOf("_ADULT") > 0){
+				key = key.substring(key.indexOf("_ADULT")+1, key.length);
+			}
+			if(key.indexOf("_CHILD") > 0){
+				key = key.substring(key.indexOf("_CHILD")+1, key.length);
+			}
+			if(key.indexOf("_NEONATAL") > 0){
+				key = key.substring(key.indexOf("_NEONATAL")+1, key.length);
+			}
+		}
+		
+		switch(key.toUpperCase()){
 			case "ID10004":
 				va_de = {};
 		        va_de['id']=key;
@@ -20,10 +40,38 @@ function renderWHOVA(va_data_in_json){
 		        va_de['value']=value;
 		        va_arr.push(va_de);
 		        break;
+			case "ID10005_R":
+				va_de = {};
+		        va_de['id']="ID10005_1";
+		        va_de['label']="Region of interview";
+		        va_de['value']=value;
+		        va_arr.push(va_de);
+		        break;
+			case "ID10005_D":
+				va_de = {};
+		        va_de['id']="ID10005_2";
+		        va_de['label']="District of interview";
+		        va_de['value']=value;
+		        va_arr.push(va_de);
+		        break;
+			case "ID10005_V":
+				va_de = {};
+		        va_de['id']="ID10005_3";
+		        va_de['label']="Village/Ward of interview";
+		        va_de['value']=value;
+		        va_arr.push(va_de);
+		        break;
 			case "ID10007":
 				va_de = {};
 		        va_de['id']=key;
 		        va_de['label']="Name of the VA Respondent";
+		        va_de['value']=value;
+		        va_arr.push(va_de);
+		        break;
+			case "ID10007_PHONE":
+				va_de = {};
+		        va_de['id']=key;
+		        va_de['label']="Phone number of the VA Respondent";
 		        va_de['value']=value;
 		        va_arr.push(va_de);
 		        break;
@@ -38,6 +86,20 @@ function renderWHOVA(va_data_in_json){
 				va_de = {};
 		        va_de['id']=key;
 		        va_de['label']="Respondent live with the deceased in the period leading to her/his death";
+		        va_de['value']=value;
+		        va_arr.push(va_de);
+		        break;
+			case "ID10010":
+				va_de = {};
+		        va_de['id']=key;
+		        va_de['label']="Name of the VA Interviewer";
+		        va_de['value']=value;
+		        va_arr.push(va_de);
+		        break;
+			case "ID10010_PHONE":
+				va_de = {};
+		        va_de['id']=key;
+		        va_de['label']="Phone number of the VA Interviewer";
 		        va_de['value']=value;
 		        va_arr.push(va_de);
 		        break;
@@ -167,51 +229,30 @@ function renderWHOVA(va_data_in_json){
 		        va_de['value']=value;
 		        va_arr.push(va_de);
 		        break;
-			case "ID10057_GRUP_ID10057_R":
+			case "ID10057_R":
 				va_de = {};
-		        va_de['id']="ID10057.1";
+		        va_de['id']="ID10057_1";
 		        va_de['label']="Region where death occurred";
 		        va_de['value']=value;
 		        va_arr.push(va_de);
 		        break;
-			case "ID10057_GROUP_ID10057_R":
+			case "ID10057_D":
 				va_de = {};
-		        va_de['id']="ID10057.1";
-		        va_de['label']="Region where death occurred";
-		        va_de['value']=value;
-		        va_arr.push(va_de);
-		        break;
-			case "ID10057_GRUP_ID10057_D":
-				va_de = {};
-		        va_de['id']="ID10057.2";
+		        va_de['id']="ID10057_2";
 		        va_de['label']="District where death occurred";
 		        va_de['value']=value;
 		        va_arr.push(va_de);
 		        break;
-			case "ID10057_GROUP_ID10057_D":
+			case "ID10057_V":
 				va_de = {};
-		        va_de['id']="ID10057.2";
-		        va_de['label']="District where death occurred";
-		        va_de['value']=value;
-		        va_arr.push(va_de);
-		        break;
-			case "ID10057_GRUP_ID10057_V":
-				va_de = {};
-		        va_de['id']="ID10057.3";
-		        va_de['label']="Village where death occurred";
-		        va_de['value']=value;
-		        va_arr.push(va_de);
-		        break;
-			case "ID10057_GROUP_ID10057_V":
-				va_de = {};
-		        va_de['id']="ID10057.3";
+		        va_de['id']="ID10057_3";
 		        va_de['label']="Village where death occurred";
 		        va_de['value']=value;
 		        va_arr.push(va_de);
 		        break;
 			case "ID10057_DEATH_OUTSIDE":
 				va_de = {};
-		        va_de['id']="ID10057.3";
+		        va_de['id']="ID10057.0";
 		        va_de['label']="Death outside the country";
 		        va_de['value']=value;
 		        va_arr.push(va_de);
@@ -3079,9 +3120,44 @@ function renderWHOVA(va_data_in_json){
 			        va_arr.push(va_de);
 		        
 			  break;
+		      case "CONSENTED_HEALTH_INS_TZ001":
+			        va_de = {};
+			        va_de['id']="TZ001";
+			        va_de['label']="Did the deceased have Health Insuarance?";
+			        va_de['value']=value;
+			        va_arr.push(va_de);
+			  break;
+		      case "CONSENTED_HEALTH_INS_TZ002":
+			        va_de = {};
+			        va_de['id']="TZ002";
+			        va_de['label']="Which among the following Health Insuarances did the deceased have?";
+			        va_de['value']=value;
+			        va_arr.push(va_de);
+			  break;
+		      case "CONSENTED_HEALTH_INS_TZ003":
+			        va_de = {};
+			        va_de['id']="TZ003";
+			        va_de['label']="Did the deceased use his/her Health Insuarance during his/her final illness?";
+			        va_de['value']=value;
+			        va_arr.push(va_de);
+			  break;
+		      case "CONSENTED_HEALTH_INS_TZ004":
+			        va_de = {};
+			        va_de['id']="TZ004";
+			        va_de['label']="Which services did the Health Insuarance provide?";
+			        va_de['value']=value;
+			        va_arr.push(va_de);
+			  break;
+		      case "CONSENTED_HEALTH_INS_TZ005":
+			        va_de = {};
+			        va_de['id']="TZ005";
+			        va_de['label']="Why did the deceased not use his/her health insuarance?";
+			        va_de['value']=value;
+			        va_arr.push(va_de);
+			  break;
 		      case "START_TIME":
 			        va_de = {};
-			        va_de['id']="TIME START";
+			        va_de['id']="TIME_START";
 			        va_de['label']="Time at start of interview";
 			        va_de['value']=value;
 			        va_arr.push(va_de);
@@ -3089,68 +3165,122 @@ function renderWHOVA(va_data_in_json){
 			  break;
 		      case "END":
 			        va_de = {};
-			        va_de['id']="TIME END";
+			        va_de['id']="TIME_END";
 			        va_de['label']="Time at end of interview";
 			        va_de['value']=value;
 			        va_arr.push(va_de);
 			  break;
-		      case "CONSENTED_DECEASED_CRVS_INFO_ON_DECEASED_AGE_ADULT":
+		      case "AGE_ADULT":
 		    	  	va_de = {};
-			        va_de['id']="ID10021";
+			        va_de['id']="AGE_ADULT";
 			        va_de['label']="Age entered in Years";
 			        va_de['value']=value;
 			        va_arr.push(va_de);
 		      break;
-		      case "CONSENTED_DECEASED_CRVS_INFO_ON_DECEASED_AGE_IN_YEARS":
+		      case "AGE_IN_YEARS":
 		    	  	va_de = {};
-			        va_de['id']="ID10021";
+			        va_de['id']="AGE_IN_YEARS";
 			        va_de['label']="Calculated Age in Years";
 			        va_de['value']=value;
 			        va_arr.push(va_de);
 		      break;
-		      case "CONSENTED_DECEASED_CRVS_INFO_ON_DECEASED_AGE_IN_MONTHS":
+		      case "AGE_IN_MONTHS":
 		    	  	va_de = {};
-			        va_de['id']="ID10021";
+			        va_de['id']="AGE_IN_MONTHS";
 			        va_de['label']="Calculated age (Months after years)";
 			        va_de['value']=value;
 			        va_arr.push(va_de);
 		      break;
-		      case "CONSENTED_DECEASED_CRVS_INFO_ON_DECEASED_AGE_CHILD_YEARS":
+		      case "AGE_CHILD_YEARS":
 		    	  	va_de = {};
-			        va_de['id']="ID10021";
+			        va_de['id']="AGE_CHILD_YEARS";
 			        va_de['label']="Age in Years,Child";
 			        va_de['value']=value;
 			        va_arr.push(va_de);
 		      break;
-		      case "CONSENTED_DECEASED_CRVS_INFO_ON_DECEASED_AGE_CHILD_MONTHS":
+		      case "AGE_CHILD_MONTHS":
 		    	  	va_de = {};
-			        va_de['id']="ID10021";
+			        va_de['id']="AGE_CHILD_MONTHS";
 			        va_de['label']="Age in Months after years, Child";
 			        va_de['value']=value;
 			        va_arr.push(va_de);
 		      break;
-		      case "CONSENTED_DECEASED_CRVS_INFO_ON_DECEASED_AGE_IN_DAYS":
+		      case "AGE_IN_DAYS":
 		    	  	va_de = {};
-			        va_de['id']="ID10021";
+			        va_de['id']="AGE_IN_DAYS";
 			        va_de['label']="Age in Days, Neonates";
 			        va_de['value']=value;
 			        va_arr.push(va_de);
 		      break;
-		      case "CONSENTED_DECEASED_CRVS_INFO_ON_DECEASED_AGE_NEONATE_DAYS":
+		      case "AGE_NEONATE_DAYS":
 		    	  	va_de = {};
-			        va_de['id']="ID10021";
+			        va_de['id']="AGE_NEONATE_DAYS";
 			        va_de['label']="Age in Days, Neonates";
 			        va_de['value']=value;
 			        va_arr.push(va_de);
 		      break;
-		      case "CONSENTED_DECEASED_CRVS_INFO_ON_DECEASED_AGE_NEONATE_HOURS":
+		      case "AGE_NEONATE_HOURS":
 		    	  	va_de = {};
-			        va_de['id']="ID10021";
+			        va_de['id']="AGE_NEONATE_HOURS";
 			        va_de['label']="Age in Hours after days, Neonates";
 			        va_de['value']=value;
 			        va_arr.push(va_de);
 		      break;
-		      
+		      case "GPS_LOCATION_LAT":
+		    	  	va_de = {};
+			        va_de['id']="GPS_LAT";
+			        va_de['label']="GPS Latitude";
+			        va_de['value']=value;
+			        va_arr.push(va_de);
+		      break;
+		      case "GPS_LOCATION_LNG":
+		    	  	va_de = {};
+			        va_de['id']="GPS_LNG";
+			        va_de['label']="GPS Longitude";
+			        va_de['value']=value;
+			        va_arr.push(va_de);
+		      break;
+		      case "GPS_LOCATION_ALT":
+		    	  	va_de = {};
+			        va_de['id']="GPS_ALT";
+			        va_de['label']="GPS Altitude";
+			        va_de['value']=value;
+			        va_arr.push(va_de);
+		      break;
+		      case "GPS_LOCATION_ACC":
+		    	  	va_de = {};
+			        va_de['id']="GPS_ACC";
+			        va_de['label']="GPS Accuracy";
+			        va_de['value']=value;
+			        va_arr.push(va_de);
+		      break;
+		      case "CONSENTED_DECEASED_CRVS_INFO_ON_DECEASED_IS_CHILD":
+		    	  	va_de = {};
+			        va_de['id']="ID00000";
+			        va_de['label']="Questionnaire type";
+			        if(value==1){
+			        	va_de['value']="CHILD";
+			        	va_arr.push(va_de);
+			        }
+		      break;
+		      case "CONSENTED_DECEASED_CRVS_INFO_ON_DECEASED_IS_NEONATAL":
+		    	  	va_de = {};
+			        va_de['id']="ID00000";
+			        va_de['label']="Questionnaire type";
+			        if(value==1){
+			        	va_de['value']="NEONATE";
+			        	va_arr.push(va_de);
+			        }
+		      break;
+		      case "CONSENTED_DECEASED_CRVS_INFO_ON_DECEASED_IS_ADULT":
+		    	  	va_de = {};
+			        va_de['id']="ID00000";
+			        va_de['label']="Questionnaire type";
+			        if(value==1){
+			        	va_de['value']="ADULT";
+			        	va_arr.push(va_de);
+			        }
+		      break;
 		      
 		}
 	});

@@ -5,7 +5,25 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>User Management</title>
+<%@ page import="iact.dev.Settings" %>
+<%
+	int roleid=0,userid=0;
+	if(session.getAttribute("roleid") != null){
+		roleid = Integer.parseInt(session.getAttribute("roleid").toString());
+	}
+	if(session.getAttribute("userid") != null){
+		userid = Integer.parseInt(session.getAttribute("userid").toString());
+	}
+	
+	if(session.isNew()){
+		//response.sendRedirect("../index.jsp");
+		response.getWriter().write("Your session has expired. Please <a href='../index.jsp'>relogin</a>");
+		return;
+	}	
+%>
+<!-- Uncomment to run this page by itself. Also uncoment script below 
 <link href="../css/bootstrap-table.min.css" rel="stylesheet">
+ -->
 </head>
 <body>
 <div class="page-container container-fluid" style="padding:0;">
@@ -35,16 +53,22 @@
 						<input name="phone" type="text" placeholder="Phone" class="form-control">
 					</div>
 					<div class="col-sm-2">
-						<input name="org" type="text" placeholder="Organization" class="form-control">
+						<select name="org" class="select2_ctl" data-placeholder="Organization" style="width : 100%;">
+							<option></option>
+							<option value="MoH">MoH</option>
+							<option value="10Wards">10 Wards</option>
+							<option value="Iringa">Iringa</option>
+							<option value="GeitaShinyanga">Geita Shinyanga</option>
+						</select>
 					</div>
 					<div class="col-sm-2">
-						<select name="role" class="select2" style="width : 100%;">
+						<select name="role" class="select2_ctl" data-placeholder="Role" style="width : 100%;">
 							<option></option>
 							<option value="0">Read Only</option>
 							<option value="1">Data Manager</option>
-							<option value="2">Coder 1</option>
-							<option value="3">Coder 2</option>
-							<option value="4">Administrator</option>
+							<option value="2">Coder/Physician</option>
+							<option value="3">Administrator</option>
+							<option value="4">Mobile User</option>
 						</select>
 					</div>
 					<div class="col-sm-3">
@@ -63,10 +87,16 @@
 		<table id="tblUsers" data-striped="true"></table>
 		</div>
 	</div>
+	<div class="panel panel-default">
+		<div class="panel-heading"><h6 class="panel-title"><i class="fa fa-newspaper-o"></i>Coding Work</h6></div>
+		<div class="panel-body">
+		<table id="tblCodingResults" data-striped="true"></table>
+		</div>
+	</div>
 </div><!-- end body -->
 <!-- modal div -->
 <div id="editUserModal" class="modal fade" tabindex="-1" role="dialog">
-<div class="modal-dialog modal-md">
+<div class="modal-dialog modal-lg">
 <form id="frmUpdateUser" action="../UserMethods" method="post" role="form">
 <div class="modal-header">
 	<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
@@ -75,11 +105,11 @@
 <div class="modal-body has-padding" style="background-color:#fff;">
 	<div class="form-group">
 		<div class="row">
-			<div class="col-sm-4">
+			<div class="col-sm-3">
            		<label for="update_username">User name</label>
            		<input name="update_username" type="text" placeholder="Username" class="form-control" readonly>
             </div>
-            <div class="col-sm-4">
+            <div class="col-sm-3">
            		<label for="update_organization">Organization</label>
            		<input name="update_organization" type="text" placeholder="Organization" class="form-control">
             </div>
@@ -93,32 +123,37 @@
     		</label>
   		</div>
 		<div class="row">            
-            <div class="col-sm-4">
+            <div class="col-sm-3">
            		<input name="update_passwd" type="password" placeholder="*********" class="form-control">
             </div>
-            <div class="col-sm-4">
+            <div class="col-sm-3">
            		<input name="update_passwd2" type="password" placeholder="**********" class="form-control">
             </div>
+            <div class="col-sm-3">
+				<input name="api_key" id="api_key" type="text" placeholder="API Key" class="form-control" readonly>
+			</div>
+			<div class="col-sm-3">
+				<button type="button" id="api_key_btn" class="btn btn-default" >Generate API Key</button>
+			</div>
 		</div>
 	</div>
 	<div class="form-group">	
 		<div class="row">
-			<div class="col-sm-4">
+			<div class="col-sm-3">
            		<label for="update_fullname">Full name</label>
            		<input name="update_fullname" type="text" placeholder="Fullname" class="form-control">
             </div>
-            <div class="col-sm-4">
+            <div class="col-sm-3">
            		<label for="update_phone">Phone</label>
            		<input name="update_phone" type="text" placeholder="Phone" class="form-control">
             </div>
-            <div class="col-sm-4">
+            <div class="col-sm-3">
            		<label for="udpate_roleid">Role</label>
-           		<select id="update_roleid" name="update_roleid" class="select2" style="width : 100%;">
+           		<select id="update_roleid" name="update_roleid" class="select2_ctl" style="width : 100%;">
            			<option value="0">Read Only</option>
            			<option value="1">Data Manager</option>
-					<option value="2">Coder 1</option>
-					<option value="3">Coder 2</option>
-					<option value="4">Administrator</option>
+					<option value="2">Coder</option>
+					<option value="3">Administrator</option>
            		</select>
             </div>
 		</div>
@@ -143,7 +178,7 @@
 		<!-- Left side -->
 		<div class="col-sm-4">
 			<div class="panel panel-default">
-			<div class="panel-heading has-padding">Physician Details</div>
+			<div class="panel-heading has-padding"><h5>Physician Details</h5></div>
 			<div class="panel-body">
 				<form class="form-horizontal" role="form" id="frmAssignVA" name="frmAssignVA">
 					<div class="form-group">
@@ -151,13 +186,14 @@
 					<div class="col-sm-8">
           				<input type="text" class="form-control" name="coderName" placeholder="Name" readonly>
           				<input type="hidden" name="coderId" value="0" >
+          				<input type="hidden" name="assignType" value="assign" >
           				<input type="hidden" name="rtype" value="31">
       				</div>
 					</div>
 					<div class="form-group">
 					<label for="coderType" class="col-sm-6 control-label">Assign As</label>
 					<div class="col-sm-6">
-          				<select id="coderType" name="coderType" class="select2" style="width : 100%;">
+          				<select id="coderType" name="coderType" class="select2_ctl" style="width : 100%;">
           					<option value="1">Coder 1</option>
           					<option value="2">Coder 2</option>
           				</select>
@@ -188,7 +224,21 @@
 		<!-- Right side -->
 		<div class="col-sm-8">
 			<div class="panel panel-default">
-			<div class="panel-heading has-padding">List of VA Records</div>
+			<div class="panel-heading has-padding">
+				<div class="row">
+					
+					<div class="col-sm-4"><h5>List of VA Records</h5></div>
+					<div class="col-sm-4 text-right"><h6>Select Table:</h6></div>
+					<div class="col-sm-4">
+					<select id="va_table" name="va_table" class="select2_ctl" style="width : 100%;">
+						<option value='0'> - - </option>
+          				<option value='"WHOVA14TZ_CORE2"'>WHOVA14TZ_CORE</option>
+          				<option value='"WHOVA151_CORE"'>WHOVA151_CORE</option>
+          				<option value='"HIA4SD_CORE"'>HIA4SD_CORE</option>
+          			</select>
+				</div>					
+				</div>
+			</div>
 			<div class="panel-body">
 				<div class="row" style="margin-top:-.5em; padding:0 5px;">
 					<div id="toolbar">
@@ -215,45 +265,38 @@
 
 <!-- end modal assign va -->
 <!-- start scripts -->
+
+<!--Uncomment to run this page by itself. Also uncomment css file above
 <script type="text/javascript" src="../js/plugins/forms/select2.min.js"></script>
 <script type="text/javascript" src="../js/plugins/interface/bootstrap-table.min.js"></script>
+ -->
 <script>
 $(document).ready(function(){
+	var RowIndex,RoleId;
+	
+	var admin_level1 = <%=Settings.admin_level1%>;
+	var admin_level2 = <%=Settings.admin_level2%>;
+	var admin_level3 = <%=Settings.admin_level3%>;
+	
 	var selections = [],
 		$tblAssignment = $("#tblAssignment"),
 		$btnAssign = $("#btnAssign");
 	
+	//api key button click
+	$("#api_key_btn").click(function(){
+		$("#api_key").val( generateKey() );
+	})
 	//set select class
-	$(".select2").select2({
-		placeholder: "Role",
+	$(".select2_ctl").select2({
 		minimumResultsForSearch: Infinity
 	});
-	
 	$("#editUserModal").on("shown.bs.modal",function(e){
 		$("input[name='update_passwd_chk']").attr('checked', false);
 	});
 	$("#divAssignVA").on("shown.bs.modal",function(e){
 		loadAssignments();
 	});
-	
-	//Checkbox click event by a button
-	//$(document).on('click', '.checkAssign', function(){ 
 		
-		//var $row = $(this).closest('tr');
-		
-		//alert( $row.find("td:nth-child(1)").text() );
-		
-	     //alert( $(this).is(':checked') );
-	     //$(this).attr("checked", returnVal);
-	     //$(this).prop("checked", returnVal);
-	//});
-	
-	//$('#tblAssignment').on('click-cell.bs.table', function (e, field, value, row, $element) {
-		//alert("e:"+e+" field:"+field+" value:"+value+" row:"+row+" element:"+$element);
-		//alert("e:"+e+" field:"+field+" value:"+value+" row:"+row['_URI']+" element:"+$element);
-		//alert('getRowByUniqueId: ' + JSON.stringify($tblAssignment.bootstrapTable('getRowByUniqueId', 3)));
-	//});
-	
 	$tblAssignment.on('check.bs.table uncheck.bs.table check-all.bs.table uncheck-all.bs.table', function () {
         $btnAssign.prop('disabled', !$tblAssignment.bootstrapTable('getSelections').length);
         
@@ -270,40 +313,42 @@ $(document).ready(function(){
 		var rows = JSON.parse(rows_text);
 		var aa  = false;
 		var msg = "";
-		if( $("#coderType").val()==1 ){
-			$.each(rows,function(i,row){
-				if(row.hasOwnProperty("coder1")){
-					msg = "Invalid selection. Coder 1 is already assigned. Unselect or change assign as to proceed";
-					aa  = true;
-					//alert("Invalid selection. Coder 1 is already assigned. Ucheck to proceed");
-					//return;
-				}
-			});
-			
-		}
-		if( $("#coderType").val()==2 ){
-			$.each(rows,function(i,row){
-				if(row.hasOwnProperty("coder2")){
-					msg = "Invalid selection. Coder 2 is already assigned. Unselect or change assign as to proceed";
-					aa = true;
-					//alert("Invalid selection. Coder 1 is already assigned. Ucheck to proceed");
-					//return;
-				}
-			});
-			
-		}
+		var updateVA = [];
+		var assignVA = [];
+		$.each(rows, function(i,row){
+			if(row.hasOwnProperty("coder1") && $("#coderType").val()==1){
+				msg = "Invalid selection. Coder 1 is already assigned. Unselect or change assign as to proceed";
+				aa  = true;
+			}
+			if(row.hasOwnProperty("coder2") && $("#coderType").val()==2){
+				msg = "Invalid selection. Coder 2 is already assigned. Unselect or change assign as to proceed";
+				aa = true;
+			}
+			if(row.hasOwnProperty("coder1") || row.hasOwnProperty("coder2")){
+				//update VA assignment
+				updateVA.push(row["_URI"]);
+			}else{
+				//assign new VA
+				assignVA.push(row["_URI"]);
+			}
+		});
 		
 		if(aa){
 			//do not assign
 			alert(msg);
-			return
+			return;
 		}else{
-			//assign
-			assignVA(selections);
+			if(assignVA.length > 0){
+				$("input[name='assignType']").val("assign");
+				fAssignVA(assignVA);	
+			}
+			if(updateVA.length > 0){
+				$("input[name='assignType']").val("update");
+				fAssignVA(updateVA);
+			}
+			//fAssignVA(selections);
 			$("#divAssignVA").modal("hide");
 		}
-		
-		
 	});
 	//function
 	$("#tblUsers").on('click-row.bs.table', function(e, row, $element){
@@ -317,10 +362,16 @@ $(document).ready(function(){
 		//Edit VA Modal
 		$("input[name='coderName']").val( row['fullname'] );
 		$("input[name='coderId']").val( row['id'] );
+		$("#update_roleid").select2('val',row['roleid'])
+		
+		RowIndex = $element.index();
 		
 	});//end table click event
-	//Get Users
+	
+	
+	//Call Functions
 	listUsers();
+	summaryOfCoding();
 	
 	
 	//Add User
@@ -449,7 +500,7 @@ $(document).ready(function(){
 	//end update user function
 
 	//Assign VA function
-	function assignVA(vaids){
+	function fAssignVA(vaids){
 		$.ajax({
 			url:"../UserMethods",
 			type:"post",
@@ -508,12 +559,12 @@ $(document).ready(function(){
 		    	title: 'Coder 2',
 		    	sortable: true
 		    },{
-			   	field: 'death_region',
-		    	title: 'Region',
+			   	field: 'death_loc_level1',
+		    	title: admin_level1,
 		    	sortable: true
 		    },{
-			   	field: 'death_district',
-		    	title: 'District',
+			   	field: 'death_loc_level2',
+		    	title: admin_level2,
 		    	sortable: true
 		    },{
 			   	field: 'death_category',
@@ -521,6 +572,59 @@ $(document).ready(function(){
 		    	sortable: true
 		    }]
 		});
+	}
+	function summaryOfCoding(){
+		$.ajax({
+			url:"../VAMethods",
+			data:"rtype=16",
+			type:"post",
+			dataType:"json",
+			success:function(data){
+				$("#tblCodingResults").bootstrapTable({
+					data:data.rows,
+					columns:[{
+					        	field:'fullname',
+					        	title:'Coder Name',
+					        	sortable:true
+					         },{
+					        	field:'assigned',
+					        	title:'Assigned VA',
+					        	sortable:true,
+					        	align:'right'
+					         },{
+					        	 field:'attempted',
+					        	 title:'Attempted VA',
+					        	 sortable:true,
+					        	 align:'right'
+					         },{
+					        	 field:'concordant',
+					        	 title:'Concordant VA',
+					        	 sortable:true,
+					        	 align:'right'
+					         },{
+					        	 field:'discordant',
+					        	 title:'Discordant VA',
+					        	 sortable:true,
+					        	 align:'right'
+					         },{
+					        	 field:'pending',
+					        	 title:'Pending VA',
+					        	 sortable:true,
+					        	 align:'right'
+					         },{
+					        	 field:'incomplete_c1',
+					        	 title:'Incomplete C1',
+					        	 sortable:true,
+					        	 align:'right'
+					         },{
+					        	 field:'incomplete_c2',
+					        	 title:'Incomplete C2',
+					        	 sortable:true,
+					        	 align:'right'
+					         }]
+				})
+			}
+		})
 	}
 	function listUsers(){
 		$.ajax({
@@ -604,6 +708,22 @@ $(document).ready(function(){
 		return value;
 	}//end edit column function
 	
+	function updateTableCell(index,cellid,cellval){
+		$("#tblOne").bootstrapTable('updateCell', {
+			index: index,
+			field: cellid,
+			value: cellval
+		});
+	}
+	function generateKey(){
+		var length = 8,
+        charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+        retVal = "";
+	    for (var i = 0, n = charset.length; i < length; ++i) {
+	        retVal += charset.charAt(Math.floor(Math.random() * n));
+	    }
+	    return retVal;
+	}
 })
 </script>
 <!-- end scripts -->

@@ -13,7 +13,7 @@
 function renderSmartVA(va_data_in_json){
 	var va_arr = [];
 	$.each(va_data_in_json,function(key,value){
-		switch(key){
+		switch(key.toUpperCase()){
 			case "GEN_2_2":
 				va_de = {};
 		        va_de['id']=key;

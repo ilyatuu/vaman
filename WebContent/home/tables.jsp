@@ -25,6 +25,9 @@
 				<button id="btnYearNext" class="btn btn-default">
         			Next <i class="glyphicon glyphicon-chevron-right"></i>
         		</button>
+        		<button id="btnExport" class="btn btn-default">
+						Export <i class="glyphicon glyphicon-export"></i>
+				</button>
 			</div>
 		</div>
    	</div>
@@ -146,23 +149,33 @@
 	//});
 	
 	$("#btnYearNext").click(function(e){
-		if( $("#txtYear").val()=="2017" ){
-			$("#txtYear").val("2018")
+		if( +$("#txtYear").val()+1 > "2019" ){
+			return;
 		}else{
-			$("#txtYear").val("2017")
+			$("#txtYear").val( +$("#txtYear").val()+1 );
 		}
+		
 		//Refresh bootstrap
 		$table.bootstrapTable('refresh');
 		
 	})
 	$("#btnYearPrev").click(function(){
-		if( $("#txtYear").val()=="2018" ){
-			$("#txtYear").val("2017")
+		
+		if( +$("#txtYear").val() - 1 < 2017 ){
+			return;
 		}else{
-			$("#txtYear").val("2018")
+			$("#txtYear").val(+$("#txtYear").val() - 1)
 		}
+		
 		//Refresh boostrap
 		$table.bootstrapTable('refresh');
+	})
+	$("#btnExport").click(function(){
+		$table.tableExport({
+			type:'csv',
+			escape:false,
+			fileName:'vadata_10wards'
+		});
 	})
 	
 </script>

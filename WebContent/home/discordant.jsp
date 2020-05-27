@@ -10,7 +10,7 @@
  -->
 <%@ page import="iact.dev.Settings" %>
 <%
-	int roleid=0,userid=0;
+	int roleid=0,userid=0,discordant=0;
 	String fullname="";
 	if(session.getAttribute("roleid") != null){
 		roleid = Integer.parseInt(session.getAttribute("roleid").toString());
@@ -20,6 +20,9 @@
 	}
 	if(session.getAttribute("fullname") != null){
 		fullname = session.getAttribute("fullname").toString();
+	}
+	if(request.getParameterMap().containsKey("discordant")){
+		discordant = Integer.parseInt(request.getParameter("discordant"));
 	}
 	
 %>
@@ -80,7 +83,6 @@
    	<div class="panel-heading"><h6 class="panel-title" id="coder1-title">Coder 1</h6></div>
    	<div class="panel-body" style="height:250px;overflow-y:scroll;">
    		<input type="hidden" id="coder1Id" />
-   		<input type="hidden" id="coder1Name" />
 	   	<div class="row">
 	   		<div class="col-sm-2 text-info"><h6>Ca.</h6></div>
 	   		<div class="col-sm-10" >
@@ -126,7 +128,6 @@
    	<div class="panel-heading"><h6 class="panel-title" id="coder2-title">Coder 2</h6></div>
    	<div class="panel-body" style="height:250px;overflow-y:scroll;">
    		<input type="hidden" id="coder2Id" />
-   		<input type="hidden" id="coder2Name" />
    		<div class="row">
 	   		<div class="col-sm-2 text-info"><h6 style="margin-left:-1px;">Ca.</h6></div>
 	   		<div class="col-sm-10" >
@@ -168,7 +169,7 @@
 </div>
 <div class="col-sm-6">
 	<div class="panel panel-default">
-	<div class="panel-heading"><h6 class="panel-title">Exchange messages with the other coder</h6></div>
+	<div class="panel-heading"><h6 class="panel-title"> <i class="fa fa-envelope-o" aria-hidden="true"></i> Exchange messages with the other coder</h6></div>
 	<div class="panel-body msg_panel" id="msg_panel">
 		<p>Some text in the panel</p>
 	</div>
@@ -202,9 +203,10 @@
  -->
 <script>
 $(document).ready(function(){
-	var rowId,to,from;
+	var rowId,tableId,to,from;
 	var userId = <%= userid %>;
 	var vatype = <%=Settings.va_type%>;
+	var icd10_db = {};
 	
 	var admin_level1 = <%=Settings.admin_level1%>;
 	var admin_level2 = <%=Settings.admin_level2%>;
@@ -221,46 +223,45 @@ $(document).ready(function(){
 	
 	//On row click event
 	$("#tblDiscordant").on('click-row.bs.table', function(e, row, $element){
-    	rowId = row['_URI'];
+    	rowId = row['va_uri'];
+    	tableId = row['va_table'];
     	
     	//Complete COD
-    	if(row['c1codaid']!=null){
-    		$("#c1coda").select2('val',row['c1codaid']);	
+    	if(row['coder1_coda']!=null){
+    		$("#c1coda").select2('val',row['coder1_coda']);	
     	}
-    	if(row['c1codbid'] != null){
-    		$("#c1codb").select2('val',row['c1codbid']);	
+    	if(row['coder1_codb'] != null){
+    		$("#c1codb").select2('val',row['coder1_codb']);	
     	}
-    	if(row['c1codcid'] != null){
-    		$("#c1codc").select2('val',row['c1codcid']);	
+    	if(row['coder1_codc'] != null){
+    		$("#c1codc").select2('val',row['coder1_codc']);	
     	}
-    	if(row['c1coddid'] != null){
-    		$("#c1codd").select2('val',row['c1coddid']);	
+    	if(row['coder1_codd'] != null){
+    		$("#c1codd").select2('val',row['coder1_codd']);	
     	}
-    	$("#c1comments").text( row['c1comments'] );
-    	$("#coder1Id").val( row['c1id'] );
-    	$("#coder1Name").val( row['c1name'] );
+    	$("#c1comments").text( row['coder1_comments'] );
+    	$("#coder1Id").val( row['coder1_id'] );
     	
     	//Coder 2
-    	if(row['c2codaid']!=null){
-    		$("#c2coda").select2('val',row['c2codaid']);	
+    	if(row['coder2_coda']!=null){
+    		$("#c2coda").select2('val',row['coder2_coda']);	
     	}
-    	if(row['c2codbid'] != null){
-    		$("#c2codb").select2('val',row['c2codbid']);	
+    	if(row['coder2_codb'] != null){
+    		$("#c2codb").select2('val',row['coder2_codb']);	
     	}
-    	if(row['c2codcid'] != null){
-    		$("#c2codc").select2('val',row['c2codcid']);	
+    	if(row['coder2_codc'] != null){
+    		$("#c2codc").select2('val',row['coder2_codc']);	
     	}
-    	if(row['c2coddid'] != null){
-    		$("#c2codd").select2('val',row['c2coddid']);	
+    	if(row['coder2_codd'] != null){
+    		$("#c2codd").select2('val',row['coder2_codd']);	
     	}
-    	$("#c2comments").text( row['c2comments'] );
-    	$("#coder2Id").val( row['c2id'] );
-    	$("#coder2Name").val( row['c2name'] );
+    	$("#c2comments").text( row['coder2_comments'] );
+    	$("#coder2Id").val( row['coder2_id'] );
  	});
 	
 	//On displaying modal, get the VA document
 	$('#modalDiscordantVA').on('show.bs.modal', function () {
-		getVAData(rowId);
+		getVAData(rowId,tableId);
 		loadMessages(rowId);
 		
 		if( $("#coder1Id").val() == userId ){
@@ -368,6 +369,7 @@ $(document).ready(function(){
 			data:"rtype=1",
 			dataType:"json",
 			success:function(data){
+				icd10_db = data; //store this for use
 				$.each(data,function(key,value){
 					$("#c1coda").append("<option value='"+value.id+"'>"+value.icdlabel+"</option>");
 					$("#c1codb").append("<option value='"+value.id+"'>"+value.icdlabel+"</option>");
@@ -415,11 +417,15 @@ $(document).ready(function(){
 			}
 		})
 	}
-	function getVAData(recid){
+	function getVAData(recid,tableid){
 		$.ajax({
 			url:"../UserMethods",
 			method:"post",
-			data:"rtype=3&uri="+recid,
+			data:{
+				rtype:3,
+				uri:recid,
+				tableid:tableid
+			},
 			dataType:"json",
 			success: function(data){
 				switch(vatype){
@@ -439,7 +445,7 @@ $(document).ready(function(){
 			}
 		});
 	}
-	function loadDiscordantVA(coderId){
+	function loadDiscordantVA_Backup(coderId){
 		$.ajax({
 			url:"../UserMethods",
 			method:"post",
@@ -493,12 +499,84 @@ $(document).ready(function(){
 			}
 		});
 	}
+	function loadDiscordantVA(coderId){
+		$.ajax({
+			url:"../GetBootTable",
+			method:"post",
+			data:{ 
+				rtype:104,
+				userId:coderId,
+				discordant:<%= discordant %>,
+				tablename:"not_used" //needed 
+			},
+			dataType:"json",
+			success:function(data){
+				$("#tblDiscordant").bootstrapTable({
+					data:data.rows,
+					columns: [{
+					   	field: 'va_uri',
+				    	title: 'VA ID',
+				    	sortable: false
+				    },{
+					   	field: 'assigned_date',
+				    	title: 'Date Assigned',
+				    	sortable: true
+				    },{
+				    	field:'c1UCD',
+				    	title:'Coder1 Underline',
+				    	formatter:returnUnderlineC1
+				    },{
+				    	field:'c2UCD',
+				    	title:'Coder2 Underline',
+				    	formatter:returnUnderlineC2
+				    },{
+				    	field: 'va_uri',
+				    	title: 'View',
+				    	align: 'center',
+				    	formatter: formatViewColumn
+				    }]
+				})
+			},error:function(){
+				
+			}
+		});
+	}
+	//return underline
+	function returnUnderlineC1(value, row, index){
+		if(row['coder1_codd']!=null)
+			return getICD10Label(row['coder1_codd']);
+		if(row['coder1_codc']!=null)
+			return getICD10Label(row['coder1_codc']);
+		if(row['coder1_codb']!=null)
+			return getICD10Label(row['coder1_codb']);
+		if(row['coder1_coda']!=null)
+			return getICD10Label(row['coder1_coda']);
+	}
+	function returnUnderlineC2(value, row, index){
+		if(row['coder2_codd']!=null)
+			return getICD10Label(row['coder2_codd']);
+		if(row['coder2_codc']!=null)
+			return getICD10Label(row['coder2_codc']);
+		if(row['coder2_codb']!=null)
+			return getICD10Label(row['coder2_codb']);
+		if(row['coder2_coda']!=null)
+			return getICD10Label(row['coder2_coda']);
+	}
 	
+	function getICD10Label(id){
+		var label = "";
+		$.each(icd10_db,function(indx,icd){
+			if(icd.id==id){
+				return label = icd.icdlabel;
+			}
+		});
+		return label;
+	}
 	//Format Functoins
 	function formatViewColumn(value, row, index){
 		return [
 					"<a href='#' data-toggle='modal' data-target='#modalDiscordantVA'>",
-					"view",
+					"<i class='fa fa-handshake-o' aria-hidden='true'></i>",
 					"</a>"
 		        ].join('');
 	}
