@@ -100,11 +100,14 @@ public class api extends HttpServlet {
 
 	protected boolean validAPIKey(String api_key){
 		try{
-			query = "SELECT 1 FROM _web_users WHERE api_key like ?";
+			query = "SELECT 1 FROM _web_users WHERE api_key::varchar LIKE ?";
 			db = new DbConnect();
 			cnn = db.getConn();
 			pstm = cnn.prepareStatement(query);
 			pstm.setString(1, api_key);
+			
+			System.out.println(pstm.toString());
+			
 			rset = pstm.executeQuery();
 			if(rset.next()){
 				return true;
@@ -134,12 +137,19 @@ public class api extends HttpServlet {
 			db = new DbConnect();
 			cnn = db.getConn();
 			if(paging){
-				query = "SELECT * FROM view_coded_va LIMIT "+iSet+" OFFSET "+iSet+"*"+iPage+" ;";
+				query  = "SELECT va_uri,va_table,icdcode,icdname,";
+				query += "COALESCE(coder1_codd,coder1_codc,coder1_codb,coder1_coda) as icdid ";
+				query += "FROM _web_assignment ";
+				query += "LEFT JOIN _web_icd10 b on COALESCE(coder1_codd,coder1_codc,coder1_codb,coder1_coda) = b.id ";
+				query += "WHERE COALESCE(coder1_codd,coder1_codc,coder1_codb,coder1_coda) = COALESCE(coder2_codd,coder2_codc,coder2_codb,coder2_coda) ";
+				query += "LIMIT "+iSet+" OFFSET "+iSet+"*"+iPage+" ;";
 			}else{
-				query = "SELECT * FROM view_coded_va;";
+				query  = "SELECT va_uri,va_table,icdcode,icdname,";
+				query += "COALESCE(coder1_codd,coder1_codc,coder1_codb,coder1_coda) as icdid ";
+				query += "FROM _web_assignment ";
+				query += "LEFT JOIN _web_icd10 b on COALESCE(coder1_codd,coder1_codc,coder1_codb,coder1_coda) = b.id ";
+				query += "WHERE COALESCE(coder1_codd,coder1_codc,coder1_codb,coder1_coda) = COALESCE(coder2_codd,coder2_codc,coder2_codb,coder2_coda) ";
 			}
-			
-			System.out.println(query);
 			
 			pstm = cnn.prepareStatement(query);
 			rset = pstm.executeQuery();

@@ -24,7 +24,7 @@ import org.json.JSONObject;
 public class VAMethods extends HttpServlet {
 	private static final long serialVersionUID = 1L;
     
-	private JSONObject jobj,json,opts;
+	private JSONObject jobj,json,opts,vatable;
 	private JSONArray jarr,jcols,tblColumns;
 	private PrintWriter pw;
 	private int rtype,rows;
@@ -133,7 +133,7 @@ public class VAMethods extends HttpServlet {
 				rows = Integer.parseInt(request.getParameter("limitTo"));
 				vas = new VA();
 				
-				JSONObject json = new JSONObject();
+				json = new JSONObject();
 				
 				
 				json.put("all", vas.getCodedVA(tblName, "all", rows));
@@ -145,10 +145,45 @@ public class VAMethods extends HttpServlet {
 				
 				pw.print(json);
 				break;
+			case 611:
+				//modified 611 call to include passing column information
+				//create va table details
+				vatable = new JSONObject();
+				vatable.put("table_name", request.getParameter("table_name"));
+				vatable.put("adult_column", request.getParameter("adult_column"));
+				vatable.put("child_column", request.getParameter("child_column"));
+				vatable.put("neonate_column", request.getParameter("neonate_column"));
+				vatable.put("interviewer_name_column", request.getParameter("interviewer_name_column"));
+				vatable.put("interviewer_phone_column", request.getParameter("interviewer_phone_column"));
+				vatable.put("limitTo", Integer.parseInt(request.getParameter("limitTo")));
+				
+				
+				//get the data
+				vas = new VA();
+				json = new JSONObject();
+				
+				json.put("all", vas.getCodedVA2(vatable,"all"));
+				json.put("adults", vas.getCodedVA2(vatable,"adults"));
+				json.put("children", vas.getCodedVA2(vatable,"children"));
+				json.put("neonates", vas.getCodedVA2(vatable,"neonates"));
+				
+				pw.print(json);
+				break;
 			case 62:
+				
 				tblName = request.getParameter("tblName");
 				vas = new VA();
 				pw.print(vas.getCodedVAAll(tblName));
+				break;
+			case 63:
+				//get coded va records
+				vatable = new JSONObject();
+				vatable.put("table_name", request.getParameter("table_name"));
+				vatable.put("death_loc_level1", request.getParameter("death_loc_level1"));
+				vatable.put("death_loc_level2", request.getParameter("death_loc_level2"));
+				
+				vas = new VA();
+				pw.print(vas.getCodedVAAll2( vatable ));
 				break;
 			}
 		}catch(Exception e){

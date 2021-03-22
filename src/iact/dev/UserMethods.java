@@ -296,6 +296,18 @@ public class UserMethods extends HttpServlet {
 				va = new VA();
 				pw.print( va.getDiscordantVA(Integer.parseInt(request.getParameter("coderId"))) );
 				break;
+			case 34:
+				//unassign va
+				jobj = new JSONObject();
+				jobj.put("coderId", request.getParameter("coderId"));
+				jobj.put("coderType", request.getParameter("coderType"));
+				if(request.getParameterMap().containsKey("dataarray")){
+					jarr = new JSONArray( request.getParameterValues("dataarray") );
+					jobj.put("vaIds", jarr);
+				}
+				va = new VA();
+				pw.print(va.UnAssignVA(jobj));
+				break;
 			case 4: //get ICD10 List
 				va = new VA();
 				pw.print(va.getICD10List());

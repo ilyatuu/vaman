@@ -185,7 +185,7 @@
 					<label for="coderName" class="col-sm-4 control-label">Name</label>
 					<div class="col-sm-8">
           				<input type="text" class="form-control" name="coderName" placeholder="Name" readonly>
-          				<input type="hidden" name="coderId" value="0" >
+          				<input type="hidden" name="coderId" id="coderId" value="0" >
           				<input type="hidden" name="assignType" value="assign" >
           				<input type="hidden" name="rtype" value="31">
       				</div>
@@ -231,9 +231,6 @@
 					<div class="col-sm-4">
 					<select id="va_table" name="va_table" class="select2_ctl" style="width : 100%;">
 						<option value='none'> - - </option>
-          				<option value='"WHOVAV14TZ_CORE2"'>WHOVA14TZ_CORE</option>
-          				<option value='"WHOVA151_CORE"'>WHOVA151_CORE</option>
-          				<option value='"HIA4SD_CORE"'>HIA4SD_CORE</option>
           			</select>
 				</div>					
 				</div>
@@ -243,6 +240,9 @@
 					<div id="toolbar">
         				<button id="btnAssign" class="btn btn-default" disabled>
             				<i class="glyphicon glyphicon-tags"></i> Assign
+        				</button>
+        				<button id="btnUnassign" class="btn btn-default" disabled>
+            				<i class="glyphicon glyphicon-share"></i> Unassign
         				</button>
     				</div>
 					<table id="tblAssignment" 
@@ -277,9 +277,13 @@ $(document).ready(function(){
 	var admin_level2 = <%=Settings.admin_level2%>;
 	var admin_level3 = <%=Settings.admin_level3%>;
 	
+	var settings = <%=Settings.jsettings%>;
+	loadVATables(settings.va_tables);
+	
 	var selections = [],
 		$tblAssignment = $("#tblAssignment"),
-		$btnAssign = $("#btnAssign");
+		$btnAssign = $("#btnAssign"),
+		$btnUnassign = $("#btnUnassign");
 	
 	loadAssignments2()
 	
@@ -300,9 +304,17 @@ $(document).ready(function(){
 	$("#va_table").on("change",function(e){
 		$tblAssignment.bootstrapTable("refresh");
 	})
-		
+	
+	
+	function loadVATables(input){
+		$.each(input,function(index,table){
+			$("#va_table").append("<option value='"+table.table_name+"'>"+table.display_name+"</option>");
+		})
+	}
+	
 	$tblAssignment.on('check.bs.table uncheck.bs.table check-all.bs.table uncheck-all.bs.table', function () {
         $btnAssign.prop('disabled', !$tblAssignment.bootstrapTable('getSelections').length);
+        $btnUnassign.prop('disabled', !$tblAssignment.bootstrapTable('getSelections').length);
         
         selections = getIdSelections();
         
@@ -310,6 +322,15 @@ $(document).ready(function(){
         $("input[name='newAssignment']").val( selections.length  );
 	});
 	
+	$btnUnassign.click(function(){
+		var rows_text = JSON.stringify($tblAssignment.bootstrapTable('getSelections'));
+		var rows = JSON.parse(rows_text);
+		var rlist = [];
+		$.each(rows,function(i,row){
+			rlist.push(row["_URI"]);
+		})
+		fUnassignVA(rlist);
+	})
 	$btnAssign.click(function(){
 		//alert( getIdSelections() );
 		//alert('getSelections: ' + JSON.stringify($tblAssignment.bootstrapTable('getSelections')));
@@ -511,6 +532,21 @@ $(document).ready(function(){
 			data:$("#frmAssignVA").serialize()+"&vaids="+vaids+"&va_table="+$("#va_table").val(),
 			success:function(data){
 				
+			}
+		})
+	}
+	function fUnassignVA(list){
+		
+		$.ajax({
+			url:"../UserMethods",
+			type:"post",
+			data:"rtype=34"+"&coderId="+$("input[name='coderId']").val()+"&coderType="+$("#coderType").val()+"&dataarray="+list,
+			success:function(data){
+				if(data.total>0){
+					alert(data.total-1+" records have been unassigned");
+				}else{
+					alert("No records have been unassigned. ")
+				}
 			}
 		})
 	}
